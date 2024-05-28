@@ -12,7 +12,7 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Hrun_db',
+        'NAME': 'my_db',
         'USER': 'root',
         'PASSWORD': 'pythonvip',
         'PORT': '3307',
