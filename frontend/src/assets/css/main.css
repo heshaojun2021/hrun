@@ -1,0 +1,134 @@
+body {
+	margin: 0;
+	overflow: hidden;
+}
+
+/* 登录页面组件样式 */
+.login_box .el-input__inner{
+	background: rgba(0,0,0,0.1) !important;
+	color: #fff;
+	font-size: 18px;
+	border: none;
+	border-radius: 0px;
+	border-bottom: solid 1px #00557f;
+}
+.login_box .el-input__prefix {
+	font-size: 18px;
+	color: #fff
+
+}
+ /*数据列表样式设置*/
+.data_box {
+	box-shadow: 0 0 5px #dcdfe6;
+}
+.data_box .title {
+	height: 40px;
+	text-align: center;
+	font: bold 20px/40px 'microsoft yahei';
+	border-bottom: solid 3px #878787;
+}
+.data_box .el-submenu__title,
+.data_box .el-submenu .el-menu-item{
+	height: 35px;
+	line-height: 35px;
+}
+
+/* 设置接口测试左侧的菜单选项卡 */
+.data_box .el-tabs__content {
+	padding: 0;
+}
+
+/* 表格折叠行展开内容 */
+.el-table__expanded-cell[class*=cell]{
+	padding: 5px  5px !important;
+}
+
+/* 弹窗四个角处理成半圆dialog*/
+.class_dialog{
+	border-radius: 20px;
+}
+
+#menu {
+  list-style: none;
+  padding-left: 0;
+}
+
+
+.el-tabs__header.is-top .el-tabs__item.is-active {
+  font-weight: bold;
+}
+
+.admin-box .el-table td {
+    padding: 5px 0;
+}
+td {
+    display: table-cell;
+    vertical-align: inherit;
+}
+.el-table th {
+	font:bold 14px 'Microsoft YaHei';
+	background: rgb(242, 243, 245);
+}
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+    background: #ffffff;
+}
+
+.el-table td .cell {
+    color: black;
+	font-family: 'Helvetica Neue', sans-serif; /* 使用 Helvetica Neue 字体 */
+	font-size: 13px;
+	line-height: 33px;
+	/*min-height: 33px*/
+}
+
+/*高亮当前选中的树节点*/
+.el-tree-node.is-current > .el-tree-node__content {
+	color: #0d84ff;
+}
+/*树节点高度和字体大小调整*/
+.el-tree-node__content {
+    height: 30px;
+    font-size: 14px;
+	line-height: 30px; /* 将行高设置为与容器高度相等 */
+}
+
+
+.el-notification .el-icon-success {
+    color: #67c23a;
+}
+
+
+/*upload宽度调整*/
+.el-upload-dragger {
+    background-color: #fff;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 962px;
+    height: 180px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+
+
+
+/*暂时不需要*/
+/*.el-icon-arrow-right:before {*/
+/*    line-height: 32px;*/
+/*    min-height: 40px;*/
+/*}*/
+/*.el-table__expand-icon {*/
+/*    position: absolute;*/
+/*     left: 50%; */
+/*     top: 50%; */
+/*     margin-left: -5px; */
+/*     margin-top: -5px; */
+/*	    line-height: 32px;*/
+/*    min-height: 40px;*/
+/*}*/
