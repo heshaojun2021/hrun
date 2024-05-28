@@ -1,0 +1,49 @@
+# 指定版本号
+"version": "3"
+# 服务，表示要启动的容器服务
+"services":
+    # 每个服务的名字就是容器的名字
+    redis:
+        image: redis:alpine
+        restart: always
+        volumes:
+            - /mydata/redis/data:/data
+            - /mydata/redis/conf/redis.conf:/etc/redis/redis.conf
+        command: redis-server /etc/redis/redis.conf
+    mariadb:
+        image: mariadb:latest
+        restart: always
+        environment:
+            MARIADB_ROOT_PASSWORD: pythonvip
+            MARIADB_DATABASE: HRUN
+        volumes:
+            - mariadb:/var/lib/mysql
+        ports:
+            - "8000:3306"
+    backend:
+        depends_on:
+            - redis
+            - mariadb
+        build: ./backend
+        image: backend_django_image
+        environment:
+            ENV: production
+        restart: always
+        volumes:
+            - app_logs:/app/logs
+        ports:
+            - "3306:3306"
+    nginx:
+        depends_on: 
+            - backend
+        build: ./nginx
+        image: backend_nginx_image
+        ports:
+            - "5001:80"
+            - "5002:81"
+        volumes:
+            - nginx_logs:/var/log
+volumes:
+    mariadb:
+    app_logs:
+    nginx_logs:
