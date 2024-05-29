@@ -1,9 +1,6 @@
 #!/bin/bash
-
-# 如果没有提供参数，默认使用 "backend"
 project=${1:-backend}
-echo "Project: $project"
-
+echo $project
 # 部署函数
 deploy(){
 	echo "开始部署项目"
@@ -30,7 +27,7 @@ delete(){
 	docker-compose -p $project down && echo "删除成功"
 }
 
-# 交互式菜单函数
+# 开始函数
 start(){
 	while true
 	do
@@ -55,15 +52,14 @@ start(){
 					;;
 				"退出菜单")
 					echo "退出菜单"
-					exit 0
-					;;
-				*)
-					echo "无效选项"
+					break
 					;;
 			esac
 		done
+		if [ $name = "退出菜单" ]; then
+			break
+		fi
 	done
 }
 
-# 调用交互式菜单函数
 start
