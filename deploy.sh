@@ -1,5 +1,6 @@
 #!/bin/bash
-project=backend
+project=${1:-backend}
+echo $project
 
 # 删除正在运行的容器
 delete_running_containers(){
