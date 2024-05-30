@@ -1,56 +1,65 @@
 #!/bin/bash
 project=${1:-backend}
 echo $project
-
-# 检查容器是否在运行
-check_running_containers(){
-    echo "检查容器是否在运行..."
-    running_containers=$(docker ps -q --filter="name=$project")
-    if [ -n "$running_containers" ]; then
-        echo "发现正在运行的容器，将执行滚动更新..."
-        deploy
-    else
-        echo "没有发现正在运行的容器"
-        delete_stopped_containers
-        echo "已删除已停止的容器，现在开始部署项目"
-        deploy
-    fi
-}
-
-# 删除已停止的容器
-delete_stopped_containers(){
-    echo "检查是否有已停止的容器..."
-    stopped_containers=$(docker ps -aq --filter="name=$project" --filter="status=exited")
-    if [ -n "$stopped_containers" ]; then
-        echo "发现已停止的容器，将它们删除..."
-        docker rm $stopped_containers
-        echo "已删除已停止的容器"
-    else
-        echo "没有发现已停止的容器"
-    fi
-}
-
 # 部署函数
 deploy(){
-    echo "开始滚动更新项目"
-    echo "注意滚动更新项目会逐个更新服务"
-
-    # 获取服务列表
-    services=$(docker-compose config --services)
-
-    # 逐个更新服务
-    for service in $services; do
-        echo "正在滚动更新服务: $service"
-        docker-compose -p $project up --no-deps --build -d $service
-        if [ $? -eq 0 ]; then
-            echo "服务 $service 更新成功"
-        else
-            echo "服务 $service 更新失败"
-        fi
-    done
-
-    echo "滚动更新完成"
+	echo "开始部署项目"
+	echo "注意部署项目会强制构建镜像"
+	docker-compose -p $project up -d --build && echo "部署成功"
 }
 
-# 执行检查容器函数
-check_running_containers
+# 重启函数
+restart(){
+	echo "开始重启项目"
+	docker-compose -p $project restart && echo "重启成功"
+}
+
+# 暂停函数
+close(){
+	echo "开始暂停项目"
+	docker-compose -p $project stop && echo "暂停成功"
+}
+
+# 删除函数
+delete(){
+	echo "开始删除项目"
+	echo "为了数据安全删除项目只会删除容器，不会删除卷，要删除卷请手动操作"
+	docker-compose -p $project down && echo "删除成功"
+}
+
+# 开始函数
+start(){
+	while true
+	do
+		select name in "部署项目" "重启项目" "暂停项目" "删除项目" "退出菜单"
+		do
+			case $name in
+				"部署项目")
+					deploy
+					break
+					;;
+				"重启项目")
+					restart
+					break
+					;;
+				"暂停项目")
+					close
+					break
+					;;
+				"删除项目")
+					delete
+					break
+					;;
+				"退出菜单")
+					echo "退出菜单"
+					break
+					;;
+			esac
+		done
+		if [ $name = "退出菜单" ]; then
+			break
+		fi
+	done
+}
+
+start
