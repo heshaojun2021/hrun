@@ -16,8 +16,6 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'pythonvip',
         'PORT': '3306',
-        # 'HOST': '172.21.0.3'  # 如果写成了ip，这个ip并不是固定，最好写成容器的名字
-                              # docker的网桥维护了一个host，使用容器的名字映射容器的ip
         'HOST': 'mariadb'
     }
 }
