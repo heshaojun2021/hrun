@@ -3,7 +3,19 @@
 		<div class="login_box">
 			<!-- log -->
 			<div class="logo_box" ><img src="../assets/images/login1.png" /></div>
-
+        <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" >
+    <el-tab-pane label="User" name="first">User</el-tab-pane>
+    <el-tab-pane label="Config" name="second">Config</el-tab-pane>
+  </el-tabs>
+      <el-menu
+        class="el-menu-demo"
+        mode="horizontal"
+        background-color="#000000"
+        style="display: flex; justify-content: space-between; padding-bottom: 10px;color: #fff;font-size: 20px"
+      >
+        <el-menu-item index="1">登录</el-menu-item>
+        <el-menu-item index="2">注册</el-menu-item>
+      </el-menu>
 			<!-- label-width是用占位的 -->
 			<el-form ref="loginRef" class="login_from" :model="loginForm" :rules="rulesLogin">
 				<!-- 账号密码输入框 -->
@@ -151,5 +163,20 @@ export default {
 		text-align: center;
     height: 100px;
 	}
-
+.el-menu.el-menu--horizontal {
+     border-bottom: none;
+}
+.el-menu--horizontal>.el-menu-item.is-active {
+    border-bottom: 2px solid var(--el-color-primary);
+     color: var(--el-color-primary);
+}
+.el-menu--horizontal>.el-menu-item {
+    float: left;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--el-text-color-secondary);
+    font-size: 16px;
+}
 </style>
