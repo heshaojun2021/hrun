@@ -21,26 +21,26 @@ class Project(models.Model):
         verbose_name = "项目表"
         verbose_name_plural = verbose_name
 
-    def info(self):
-        """返回项目的统计信息"""
-        return [
-            {'name': '执行环境', 'value': self.test_envs.count()},
-            {'name': '测试场景', 'value': self.testcase.count()},
-            {'name': '测试计划', 'value': self.test_plans.count()},
-            {'name': '接口数量', 'value': self.new_interface.count()},
-            {'name': '定时任务', 'value': self.crontab_jobs.count()},
-            {'name': '执行记录', 'value': Record.objects.filter(plan__project=self).count()},
-            ]
-
-    def bugs(self):
-        """返回项目的bugs统计信息"""
-        return [
-            {'name': '待处理', 'value': self.bug_set.filter(status='待处理').count()},
-            {'name': '处理中', 'value': self.bug_set.filter(status='处理中').count()},
-            {'name': '已关闭', 'value': self.bug_set.filter(status='已关闭').count()},
-            {'name': '处理完成', 'value': self.bug_set.filter(status='处理完成').count()},
-            {'name': '无需处理', 'value': self.bug_set.filter(status='无需处理').count()}
-        ]
+    # def info(self):
+    #     """返回项目的统计信息"""
+    #     return [
+    #         {'name': '执行环境', 'value': self.test_envs.count()},
+    #         {'name': '测试场景', 'value': self.testcase.count()},
+    #         {'name': '测试计划', 'value': self.test_plans.count()},
+    #         {'name': '接口数量', 'value': self.new_interface.count()},
+    #         {'name': '定时任务', 'value': self.crontab_jobs.count()},
+    #         {'name': '执行记录', 'value': Record.objects.filter(plan__project=self).count()},
+    #         ]
+    #
+    # def bugs(self):
+    #     """返回项目的bugs统计信息"""
+    #     return [
+    #         {'name': '待处理', 'value': self.bug_set.filter(status='待处理').count()},
+    #         {'name': '处理中', 'value': self.bug_set.filter(status='处理中').count()},
+    #         {'name': '已关闭', 'value': self.bug_set.filter(status='已关闭').count()},
+    #         {'name': '处理完成', 'value': self.bug_set.filter(status='处理完成').count()},
+    #         {'name': '无需处理', 'value': self.bug_set.filter(status='无需处理').count()}
+    #     ]
 
 
 class TestEnv(models.Model):

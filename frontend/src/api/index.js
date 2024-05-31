@@ -36,7 +36,7 @@ axios.interceptors.response.use(config => {
 axios.interceptors.request.use(config => {
   const url = config.url;
   const regex = /^\/records\/\d+(?:\/report)?\/?/; // 匹配 /records/ 下的所有请求
-  if (!regex.test(url) && url !== '/users/login/') {
+  if (!regex.test(url) && url !== '/users/login/' && url !== '/users/user/') {
     config.headers.Authorization = 'Bearer ' + window.sessionStorage.getItem('token');
   }
   return config;

@@ -8,5 +8,5 @@ class UserFilter(filters.FilterSet):
     class Meta:
         model = User
         # 过滤字段
-        fields = ['email', 'mobile', 'username','project_name']
+        fields = ['email', 'mobile', 'username', 'project_name']
 

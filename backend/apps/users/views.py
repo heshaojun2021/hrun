@@ -1,4 +1,6 @@
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -34,3 +36,10 @@ class UserViewSet(ModelViewSet):
             queryset = queryset.filter(project=project)
         return queryset
 
+    @action(detail=False, methods=['get'])
+    def exclude_project(self, request):
+        queryset = super().get_queryset()
+        project_id = request.query_params.get('project')
+        queryset = queryset.exclude(project=project_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

@@ -20,7 +20,27 @@
 			</span>
   </div>
   <el-button @click="clickAdd"  plain type="success" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">新增用户</el-button>
+  <el-button @click="clickAddPro"  plain type="primary" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">添加其他项目成员</el-button>
 
+  <el-dialog v-model="addProDlg" title="添加其他项目成员"  width="30%" custom-class="class_dialog" :required="true" style="text-align:left" :before-close="clearValidation">
+		<el-form :model="addProForm" label-width="80px" style="max-width: 500px">
+      <el-form-item label="所属项目" :required="true" style="text-align:left" >
+        <el-input v-model="addProForm.project_name" autocomplete="off" disabled/>
+      </el-form-item>
+
+      <el-form-item label="选择用户">
+				<el-select  multiple v-model="addProForm.user_ids" placeholder="请选择用户" style="width: 100%;">
+          <el-option  :label="iter.weChat_name" :value="iter.weChat_name" v-for="iter in filteredUsers" :key="iter.id"></el-option>
+				</el-select>
+			</el-form-item>
+		</el-form>
+		<template #footer>
+			<span class="dialog-footer">
+				<el-button @click="clearValidation" size="medium">取消</el-button>
+				<el-button type="success" @click="AddInter" size="medium">确定</el-button>
+			</span>
+		</template>
+	</el-dialog>
   <!--  新增用户弹窗-->
 	<el-dialog v-model="addDlg" title="新增用户"  width="30%" custom-class="class_dialog" :required="true" style="text-align:left" :before-close="clearValidation">
 		<el-form :model="addForm"  :rules="rulesUser" ref="UserRef" label-width="80px" style="max-width: 500px">
@@ -37,7 +57,7 @@
       <el-form-item label="所属项目" :required="true" style="text-align:left" >
         <el-input v-model="addForm.project_name" autocomplete="off" disabled/>
       </el-form-item>
-      <el-form-item label="密码" prop="password" >
+      <el-form-item clearable :readonly="readonlyInput" label="密码" prop="password" >
         <el-input v-model="addForm.password"  type="password" show-password maxlength="18" minlength="3" placeholder="请输入密码"/>
       </el-form-item>
 
@@ -147,51 +167,53 @@ export default {
      Pager:'',
      addDlg: false,
      addForm: {
-				username: '',
-				mobile: '',
-				email: '',
-				project_id:'',
+        username: '',
+        mobile: '',
+        email: '',
+        project_id:'',
         project_name:'',
         password:'',
         weChat_name:""
-			},
+      },
      editDlg: false,
      editForm: {
-				username: '',
-				mobile: '',
-				email: '',
-				project_id:'',
+        username: '',
+        mobile: '',
+        email: '',
+        project_id:'',
         project_name:'',
         password:'',
         weChat_name:""
-			},
+      },
      showResetPassword: false,
-
+     addProDlg: false,
+     addProForm:{},
      rulesUser: {
-				// 验证用户名是否合法
-				username: [
-					{
-						required: true,
-						message: '请输入用户名',
-						trigger: 'blur'
-					}
-				],
-				// 验证密码是否合法
-				password: [
-					{
-						required: true,
-						message: '请输入密码',
-						trigger: 'blur'
-					}
-				],
+        // 验证用户名是否合法
+        username: [
+          {
+            required: true,
+            message: '请输入用户名',
+            trigger: 'blur'
+          }
+        ],
+        // 验证密码是否合法
+        password: [
+          {
+            required: true,
+            message: '请输入密码',
+            trigger: 'blur'
+          }
+        ],
        mobile: [
-					{
-						required: true,
-						message: '请输入手机号',
-						trigger: 'blur'
-					}
-				]
-			}
+          {
+            required: true,
+            message: '请输入手机号',
+            trigger: 'blur'
+          }
+        ]
+      },
+     readonlyInput: true,
     }
   },
   computed: {
@@ -202,6 +224,9 @@ export default {
 
 
   methods: {
+    cancelReadOnly() {
+      this.readonlyInput = false;
+    },
     // 列表数据展示
     async getAllUser(page,size){
       const username = this.QueryCondition.username.trim();
@@ -267,9 +292,18 @@ export default {
 
 			};
     },
+    clickAddPro() {
+      this.addProDlg = true;
+      this.addProForm = {
+        project_id:this.pro.id,
+        project_name:this.pro.name,
+        weChat_name:''
+			};
+    },
     clearValidation() {
       this.addDlg = false;
       this.editDlg = false;
+      this.addProDlg = false;
       this.showResetPassword = false;
       this.$refs.UserRef.clearValidate(); // 清除验证信息
     },

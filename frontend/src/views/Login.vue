@@ -1,47 +1,54 @@
 <template>
 	<LoginBack>
 		<div class="login_box">
-			<!-- log -->
 			<div class="logo_box" ><img src="../assets/images/login1.png" /></div>
-        <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick" >
-    <el-tab-pane label="User" name="first">User</el-tab-pane>
-    <el-tab-pane label="Config" name="second">Config</el-tab-pane>
-  </el-tabs>
-      <el-menu
-        class="el-menu-demo"
-        mode="horizontal"
-        background-color="#000000"
-        style="display: flex; justify-content: space-between; padding-bottom: 10px;color: #fff;font-size: 20px"
-      >
-        <el-menu-item index="1">登录</el-menu-item>
-        <el-menu-item index="2">注册</el-menu-item>
-      </el-menu>
-			<!-- label-width是用占位的 -->
-			<el-form ref="loginRef" class="login_from" :model="loginForm" :rules="rulesLogin">
-				<!-- 账号密码输入框 -->
-				<el-form-item prop="username">
-					<el-input size="default" v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="请输入账号"></el-input>
-				</el-form-item>
-				<el-form-item prop="password">
-					<el-input type="password" size="default" v-model="loginForm.password" placeholder="请输入密码" prefix-icon="el-icon-lock" show-password></el-input>
-				</el-form-item>
-				<el-form-item size="mini" label="记住用户" style="margin-top: 10px;"><el-switch v-model="status" size="default" active-color="#1296db"></el-switch></el-form-item>
-				<!-- 按钮 -->
-				<el-form-item class="btns">
-					<el-button size="default" style="color:#fff;width: 100%;background: #1296db;border: 0;" @click="login">登&nbsp;&nbsp; 录</el-button>
-				</el-form-item>
-			</el-form>
-			<div style="color: #fff;">
-				没有账号?
-				<span  @click="clickRegister" style="color:#1296db;cursor:pointer;">点击注册</span>
-			</div>
+        <el-tabs v-model="activeName" class="demo-tabs">
+          <el-tab-pane label="登 录" name="first">
+            <el-form ref="loginRef" class="login_from" :model="loginForm" :rules="rulesLogin">
+              <el-form-item prop="username">
+                <el-input size="default" v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="请输入账号"></el-input>
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input type="password" size="default" v-model="loginForm.password" placeholder="请输入密码" prefix-icon="el-icon-lock" show-password></el-input>
+              </el-form-item>
+              <div style="display: flex; justify-content: space-between;">
+                  <div>
+                      <el-form-item size="mini" label="记住用户" style="margin-top: 6px;">
+                          <el-switch v-model="status" size="default" active-color="#1296db"></el-switch>
+                      </el-form-item>
+                  </div>
+                  <div style="color: #fff;margin-top: 10px;">
+                      没有账号?
+                      <span @click="clickRegister" style="color:#1296db;cursor:pointer;">去注册</span>
+                  </div>
+              </div>
+              <!-- 按钮 -->
+              <el-form-item>
+                <el-button size="default" type="primary" style="width: 100%" @click="login">登&nbsp;&nbsp; 录</el-button>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+          <el-tab-pane label="注 册" name="second">
+            <el-form class="login_from" :model="createForm">
+              <el-form-item>
+                <el-input clearable :readonly="readonlyInput" @focus="cancelReadOnly" size="default" v-model="createForm.username" prefix-icon="el-icon-user" placeholder="请输入账号"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-input clearable :readonly="readonlyInput" @focus="cancelReadOnly"  type="password" size="default" v-model="createForm.password" placeholder="请输入密码" prefix-icon="el-icon-lock" show-password></el-input>
+              </el-form-item>
+              <el-form-item >
+                <el-button size="default" type="primary" style="width: 100%" @click="createClick">注&nbsp;&nbsp; 册</el-button>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+        </el-tabs>
 		</div>
 	</LoginBack>
 </template>
 
 <script type="text/javascript">
 import LoginBack from '../components/common/LoginBack.vue';
-
+import {ElNotification} from "element-plus";
 export default {
 	components: {
 		LoginBack
@@ -53,7 +60,13 @@ export default {
 				username: '',
 				password: ''
 			},
+      createForm: {
+        username: '',
+				password: '',
+        project_id: 1
+      },
 			status: false,
+      readonlyInput: true,
 			rulesLogin: {
 				// 验证用户名是否合法
 				username: [
@@ -93,13 +106,34 @@ export default {
         {id:18,Emojis:"streamline-emojis:star-struck-1"},
         {id:19,Emojis:"streamline-emojis:winking-face"},
         {id:20,Emojis:"streamline-emojis:upside-down-face"}
-      ]
+      ],
+      activeName: 'first'
 		};
 	},
 	methods: {
 		clickRegister() {
-    this.$router.push({name: 'createUser'})
+      this.activeName = 'second'
 		},
+    cancelReadOnly() {
+      this.readonlyInput = false;
+    },
+    async createClick() {
+        const params = {...this.createForm}
+        const response = await this.$api.createUser(params)
+        if (response.status===201) {
+          ElNotification({
+              duration: 1000,
+              title: '创建成功，可以登录咯',
+              type: 'success',
+            })
+          this.activeName = 'first'
+          this.createForm = {
+              username: '',
+              password: '',
+              project_id: 1
+            };
+        }
+    },
     userAvatar() {
       const randomIndex = Math.floor(Math.random() * this.userIcon.length);
       const selectedEmojis = this.userIcon[randomIndex];
@@ -110,7 +144,6 @@ export default {
 		login() {
 			// 通过表单的validate方法来验证表单，验证的结果会传递到validate的回调函数中
 			this.$refs.loginRef.validate(async vaild => {
-				// 判断是否验证通过，不通过则直接retrue
 				if (!vaild) return;
 				// 发送请求
 				const response = await this.$api.login(this.loginForm);
@@ -163,20 +196,19 @@ export default {
 		text-align: center;
     height: 100px;
 	}
-.el-menu.el-menu--horizontal {
-     border-bottom: none;
-}
-.el-menu--horizontal>.el-menu-item.is-active {
-    border-bottom: 2px solid var(--el-color-primary);
-     color: var(--el-color-primary);
-}
-.el-menu--horizontal>.el-menu-item {
-    float: left;
+
+/deep/ .el-tabs__item {
+    text-align: center;
+    padding: 0 0;
     height: 40px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
     line-height: 40px;
-    margin: 0;
-    border-bottom: 2px solid transparent;
-    color: var(--el-text-color-secondary);
-    font-size: 16px;
+    display: inline-block;
+    list-style: none;
+    font-size: 18px;
+    font-weight: 500;
+    position: relative;
+    width: 200px;
 }
 </style>

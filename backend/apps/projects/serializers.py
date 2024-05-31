@@ -13,7 +13,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     # 注意，info和bugs是对象方法
     class Meta:
         model = Project
-        fields = ['id', 'create_time', 'name', 'leader', 'leader_id', 'info', 'bugs', 'desc']
+        fields = ['id', 'create_time', 'name', 'leader', 'leader_id', 'desc']
 
 
 class ProjectNestTestStepSerializer(serializers.ModelSerializer):

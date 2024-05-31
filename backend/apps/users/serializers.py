@@ -38,10 +38,10 @@ class MyRefreshTokenSerializer(TokenRefreshSerializer):
 # 注册用户序列化器
 class UserRegisterSerializer(serializers.ModelSerializer):
     project = ProjectSerializer(many=True, read_only=True)
-    project_id =serializers.CharField(label='项目id', help_text='项目id',write_only=True)
+    project_id =serializers.CharField(label='项目id', help_text='项目id', write_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'password',  'email', 'mobile', 'date_joined', 'project',  'project_id','weChat_name']
+        fields = ['id', 'username', 'password',  'email', 'mobile', 'date_joined', 'project', 'project_id', 'weChat_name']
         # 修改模型字段的参数
         extra_kwargs = {
             'username': {
@@ -64,10 +64,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             "date_joined": {
                 'read_only': True,
             },
-            'email': {
-                'required': True,
-                'validators': [UniqueValidator(queryset=model.objects.all(), message='此邮箱已经注册')]
-            }
         }
 
     def create(self, validated_data):
@@ -90,18 +86,5 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             validated_data['password'] = make_password(password)
 
         return super().update(instance, validated_data)
-
-     # def validate(self, attrs):
-    #     # 校验密码和确认密码相等
-    #     password = attrs.get('password')
-    #     password_confirm = attrs.get('password_confirm')
-    #     # if password_confirm != password:
-    #     #     raise serializers.ValidationError('两次输入的密码不一致')
-    #
-    #     # 第一种删掉password_confirm的方法
-    #     if password_confirm:
-    #         attrs.pop('password_confirm')
-    #         return attrs
-    #     return attrs
 
 
