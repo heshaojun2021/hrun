@@ -134,6 +134,7 @@
                       size="small"
                       class="card-button"
                       @click="clickEditStep(scope.row.id)"
+                      style="font-weight: bold"
                     >
                       调试
                     </el-button>
@@ -142,6 +143,7 @@
                       size="small"
                       class="card-button"
                       @click="clickCopy(scope.row.id)"
+                      style="font-weight: bold"
                     >
                       复制
                     </el-button>
@@ -149,6 +151,7 @@
                       type="text"
                       size="mini"
                       @click="clickDel(scope.row.id)"
+                      style="font-weight: bold"
                     >
                       删除
                     </el-button>
@@ -157,9 +160,10 @@
                       size="small"
                       class="card-button"
                       @click="clickLog"
+                      style="font-weight: bold"
                     >
                       操作记录
-                    </el-button>
+                    </el-button >
                          <el-dropdown style="margin-left: 10px" trigger="click">
                           <el-button  type="text" size="small" :style="{ color: buttonColor(scope.row.status) }">
                             <i v-if="scope.row.status!='状态'" class="el-icon-s-flag" style="margin-right: -1px;" :style="{ color: buttonColor(scope.row.status) }"></i>
