@@ -16,39 +16,39 @@
     </span>
 			<span class="buttons">
 				<el-button @click="resetForm"  icon="el-icon-refresh">重置</el-button>
-				<el-button type="success" @click="submitForm"  icon="el-icon-refresh"> 查询</el-button>
+				<el-button type="primary" @click="submitForm"  icon="el-icon-refresh"> 查询</el-button>
 			</span>
   </div>
   <el-button @click="clickAdd"  plain type="success" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">新增用户</el-button>
   <el-button @click="clickAddPro"  plain type="primary" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">添加其他项目成员</el-button>
 
   <el-dialog v-model="addProDlg" title="添加其他项目成员"  width="30%" custom-class="class_dialog" :required="true" style="text-align:left" :before-close="clearValidation">
-		<el-form :model="addProForm" label-width="80px" style="max-width: 500px">
+		<el-form :model="addProForm" :rules="rulesUser" ref="UserRef" label-width="80px" style="max-width: 500px">
       <el-form-item label="所属项目" :required="true" style="text-align:left" >
         <el-input v-model="addProForm.project_name" autocomplete="off" disabled/>
       </el-form-item>
 
       <el-form-item label="选择用户">
-				<el-select  multiple v-model="addProForm.user_ids" placeholder="请选择用户" style="width: 100%;">
-          <el-option  :label="iter.weChat_name" :value="iter.weChat_name" v-for="iter in filteredUsers" :key="iter.id"></el-option>
+				<el-select  multiple v-model="addProForm.users" placeholder="请选择用户" style="width: 100%;">
+          <el-option  :label="iter.username" :value="iter.id" v-for="iter in usersExclude" :key="iter.id"></el-option>
 				</el-select>
 			</el-form-item>
 		</el-form>
 		<template #footer>
 			<span class="dialog-footer">
 				<el-button @click="clearValidation" size="medium">取消</el-button>
-				<el-button type="success" @click="AddInter" size="medium">确定</el-button>
+				<el-button type="primary" @click="clickExcludeUser" size="medium">确定</el-button>
 			</span>
 		</template>
 	</el-dialog>
   <!--  新增用户弹窗-->
 	<el-dialog v-model="addDlg" title="新增用户"  width="30%" custom-class="class_dialog" :required="true" style="text-align:left" :before-close="clearValidation">
 		<el-form :model="addForm"  :rules="rulesUser" ref="UserRef" label-width="80px" style="max-width: 500px">
-      <el-form-item label="用户名">
-        <el-input v-model="addForm.weChat_name"  maxlength="50" minlength="1" placeholder="请输入名称"/>
+      <el-form-item prop="username" label="用户名">
+        <el-input v-model="addForm.username"  maxlength="18" minlength="3" placeholder="请输入用户名" show-word-limit/>
       </el-form-item>
-      <el-form-item prop="username" label="登录账号">
-        <el-input v-model="addForm.username"  maxlength="18" minlength="3" placeholder="请输入账号" show-word-limit/>
+      <el-form-item label="标签">
+        <el-input v-model="addForm.weChat_name"  maxlength="50" minlength="1" placeholder="请输入名称"/>
       </el-form-item>
 			<el-form-item label="手机号码" prop="mobile">
         <el-input v-model="addForm.mobile"  maxlength="11" minlength="11" placeholder="请输入手机号"/>
@@ -65,18 +65,18 @@
 		<template #footer>
 			<span class="dialog-footer">
 				<el-button @click="clearValidation" size="medium">取消</el-button>
-				<el-button type="success" @click="AddInter" size="medium">确定</el-button>
+				<el-button type="primary" @click="AddInter" size="medium">确定</el-button>
 			</span>
 		</template>
 	</el-dialog>
   <!-- 修改项目的窗口 -->
 	<el-dialog v-model="editDlg" title="修改用户" width="30%" custom-class="class_dialog" :required="true" style="text-align:left" :before-close="clearValidation">
 		<el-form :model="editForm"  :rules="rulesUser" ref="UserRef" label-width="80px" style="max-width: 500px">
-      <el-form-item label="用户名" >
-        <el-input v-model="editForm.weChat_name"  maxlength="50" minlength="1" placeholder="请输入名称"/>
+      <el-form-item prop="username" label="用户名">
+        <el-input v-model="editForm.username"  maxlength="18" minlength="3" placeholder="请输入用户名" disabled />
       </el-form-item>
-      <el-form-item prop="username" label="登录账号">
-        <el-input v-model="editForm.username"  maxlength="18" minlength="3" placeholder="请输入账号" disabled />
+      <el-form-item label="标签" >
+        <el-input v-model="editForm.weChat_name"  maxlength="50" minlength="1" placeholder="请输入名称"/>
       </el-form-item>
 			<el-form-item label="手机号码" prop="mobile">
         <el-input v-model="editForm.mobile"  maxlength="11" minlength="11" placeholder="请输入手机号"/>
@@ -93,9 +93,9 @@
 		</el-form>
 		<template #footer>
 			<span class="dialog-footer">
-        <el-button  type="primary" @click="resetPassword" size="medium">重置密码</el-button>
-        <el-button type="success" @click="UpdateInter" size="medium">确定</el-button>
-				<el-button @click="clearValidation" size="medium">取消</el-button>
+        <el-button  type="primary" @click="resetPassword" >重置密码</el-button>
+        <el-button type="primary" @click="UpdateInter" >确定</el-button>
+				<el-button @click="clearValidation" >取消</el-button>
 			</span>
 		</template>
 	</el-dialog>
@@ -106,8 +106,8 @@
                 <span>{{ scope.$index + 1 }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="登录账号" prop="username" align="center" />
-            <el-table-column label="用户名" prop="weChat_name" align="center" />
+            <el-table-column label="用户名" prop="username" align="center" />
+            <el-table-column label="标签" prop="weChat_name" align="center" />
             <el-table-column label="手机号码" prop="mobile" align="center"/>
             <el-table-column label="邮箱" prop="email" align="center"/>
             <el-table-column label="所属项目"  show-overflow-tooltip align="center">
@@ -125,7 +125,7 @@
             </el-table-column>
             <el-table-column label="操作" width="180" align="center">
               <template #default="scope">
-                <el-button @click="clickEdit(scope.row)" size="mini" plain type="success" icon="el-icon-edit-outline">编辑</el-button>
+                <el-button @click="clickEdit(scope.row)" size="mini" plain type="primary" icon="el-icon-edit-outline">编辑</el-button>
                 <el-button @click="delUser(scope.row.id)" size="mini" type="danger" plain icon="el-icon-delete">删除</el-button>
               </template>
             </el-table-column>
@@ -157,16 +157,16 @@ import Interface from "@/views/Interface";
 export default {
   data() {
     return {
-     UserLsit:"",
-     QueryCondition:{
+      UserLsit:"",
+      QueryCondition:{
        username:"",
        mobile:"",
        email:"",
        project_name:"",
       },
-     Pager:'',
-     addDlg: false,
-     addForm: {
+      Pager:'',
+      addDlg: false,
+      addForm: {
         username: '',
         mobile: '',
         email: '',
@@ -175,8 +175,8 @@ export default {
         password:'',
         weChat_name:""
       },
-     editDlg: false,
-     editForm: {
+      editDlg: false,
+      editForm: {
         username: '',
         mobile: '',
         email: '',
@@ -185,10 +185,14 @@ export default {
         password:'',
         weChat_name:""
       },
-     showResetPassword: false,
-     addProDlg: false,
-     addProForm:{},
-     rulesUser: {
+      showResetPassword: false,
+      addProDlg: false,
+      addProForm:{
+        project_id:'',
+        users:''
+
+      },
+      rulesUser: {
         // 验证用户名是否合法
         username: [
           {
@@ -213,7 +217,8 @@ export default {
           }
         ]
       },
-     readonlyInput: true,
+      readonlyInput: true,
+      usersExclude: []
     }
   },
   computed: {
@@ -263,6 +268,24 @@ export default {
         this.Pager = response.data
 			}
 		},
+
+    async getExcludeUser() {
+        const response = await this.$api.getExcludeUser(this.pro.id);
+        if (response.status === 200) {
+            const userData = response.data;
+            this.usersExclude = userData.map(user => {
+                return {
+                    id: user.id,
+                    username: user.username
+                };
+            });
+            console.log('打印：', this.usersExclude)
+        }
+    },
+
+    async clickExcludeUser() {
+      console.log(this.addProForm)
+    },
     resetForm() {
       // 重置表单逻辑
       this.QueryCondition.username='';
@@ -297,15 +320,17 @@ export default {
       this.addProForm = {
         project_id:this.pro.id,
         project_name:this.pro.name,
-        weChat_name:''
+        users:[]
+
 			};
+      this.getExcludeUser()
     },
     clearValidation() {
       this.addDlg = false;
       this.editDlg = false;
       this.addProDlg = false;
       this.showResetPassword = false;
-      this.$refs.UserRef.clearValidate(); // 清除验证信息
+      this.$refs.UserRef.clearValidate();
     },
 
     AddInter(){
