@@ -429,6 +429,7 @@ export default {
     //  组装接口的数据
     getEditData() {
       let caseData = {...this.caseInfo};
+      delete caseData.status
       // 获取最后一个节点的id
       if (caseData.treenode && caseData.treenode.length > 0) {  // 检查列表是否存在且不为空
         const lastValue = caseData.treenode[caseData.treenode.length - 1];  // 获取最后一个值
