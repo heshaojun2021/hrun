@@ -53,4 +53,4 @@ class RecordViewSet(ReadOnlyModelViewSet):
             cache.set(cache_key, serializer.data, 3 * 24 * 60 * 60)
             return Response(serializer.data)
         except Exception as e:
-            print(f"Error setting cache: {e}")
+            Response({'message': str(e)}, status=400)

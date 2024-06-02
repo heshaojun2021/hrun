@@ -147,13 +147,13 @@ class TestCaseStepViewSet(ModelViewSet):
             instance = CaseStepData.objects.get(pk=pk)
             if instance.parent_id:
                 if CaseStepData.objects.filter(parent_id=instance.id).exists():
-                    return Response({"detail": "存在未删除的子节点，请先删除子节点后再操作"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"message": "存在未删除的子节点，请先删除子节点后再操作"}, status=status.HTTP_400_BAD_REQUEST)
                 CaseStepData.objects.filter(id=instance.id).delete()
             else:
                 if CaseStepData.objects.filter(parent_id=instance.id).exists():
-                    return Response({"detail": "存在未删除的子节点，请先删除子节点后再操作"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"message": "存在未删除的子节点，请先删除子节点后再操作"}, status=status.HTTP_400_BAD_REQUEST)
                 instance.delete()
-            return Response({"detail": "操作成功"},status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "操作成功"},status=status.HTTP_204_NO_CONTENT)
 
         except CaseStepData.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -163,7 +163,7 @@ class TestCaseStepViewSet(ModelViewSet):
         """批量创建接口"""
         data = request.data  # 获取请求中的数据
         if not data:
-            return Response({'error': '提交的数据不可是空列表'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': '提交的数据不可是空列表'}, status=status.HTTP_400_BAD_REQUEST)
         objs = []
         if isinstance(data, list):
             for item in data:
@@ -177,14 +177,14 @@ class TestCaseStepViewSet(ModelViewSet):
                     obj = CaseStepData(sort=sort, case=case, interfaceStep=interfaceStep)
                     objs.append(obj)
                 else:
-                    return Response({'error': '缺失必填参数'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'message': '缺失必填参数'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error': '输出对象应该是一个列表'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': '输出对象应该是一个列表'}, status=status.HTTP_400_BAD_REQUEST)
 
         # 一次性保存所有对象
         CaseStepData.objects.bulk_create(objs)
 
-        return Response("创建成功", status=status.HTTP_201_CREATED)
+        return Response({'message':'创建成功'}, status=status.HTTP_201_CREATED)
 
     def update_step_data(self, data, parent_id=None):
         for item in data:
@@ -213,7 +213,7 @@ class TestPlanViewSet(ModelViewSet):
     @action(methods=['post'], detail=True)
     def run(self, request, pk):
         if not self.queryset.get(id=pk).new_scenes.all():
-            return Response({'detail': '该计划下无测试场景，请添加后再试'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': '该计划下无测试场景，请添加后再试'}, status=status.HTTP_400_BAD_REQUEST)
         plan = self.get_object()
         # 1. 获取环境id
         env_id = request.data.get('env')
@@ -316,7 +316,7 @@ class StepControllerViewSet(ModelViewSet):
         try:
             data = request.data
             if not isinstance(data, list):
-                return Response({'error': '传入的数据不是list类型'}, status=400)
+                return Response({'message': '传入的数据不是list类型'}, status=400)
 
             # 定义递归函数来处理children中的数据
             def process_children(data):
@@ -324,7 +324,7 @@ class StepControllerViewSet(ModelViewSet):
                     # 提取stepInfo数据
                     step_info = item.get('stepInfo', None)
                     if step_info is None:
-                        return Response({'error': '数据缺少stepInfo'}, status=400)
+                        return Response({'message': '数据缺少stepInfo'}, status=400)
 
                     # 检查stepInfo中的type是否为api，如果是，则跳过该节点
                     if step_info.get('type') == 'api':
@@ -333,7 +333,7 @@ class StepControllerViewSet(ModelViewSet):
                     # 获取主键
                     pk = step_info.get('id', None)
                     if pk is None:
-                        return Response({'error': '数据缺少标识'}, status=400)
+                        return Response({'message': '数据缺少标识'}, status=400)
 
                     # 删除不需要的键
                     item['stepInfo'].pop('id', None)
@@ -355,4 +355,4 @@ class StepControllerViewSet(ModelViewSet):
             return Response(request.data, status=200)
 
         except Exception as e:
-            return Response({'error': str(e)}, status=400)
+            return Response({'message': str(e)}, status=400)

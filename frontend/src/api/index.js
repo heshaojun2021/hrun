@@ -78,7 +78,7 @@ axios.interceptors.response.use(function(response) {
 	} else {
 		// 其他的响应状态码提示
 		ElMessage({
-			message: response.data.detail,
+			message: response.data,
 			type: 'warning',
 			duration: 1000
 		});

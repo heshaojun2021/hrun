@@ -42,7 +42,7 @@ class YApiViewSet(APIView):
             import_run_yapi(request.data)
             return Response(status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ProjectBoardView(APIView):
     def post(self, request, *args, **kwargs):
@@ -67,6 +67,6 @@ class ProjectBoardView(APIView):
                 cache.set(cache_key, data, timeout=120)  # 设置缓存有效期为1小时
                 return Response(data, status=status.HTTP_200_OK)
             else:
-                return Response({"detail": "项目不存在"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "项目不存在"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
