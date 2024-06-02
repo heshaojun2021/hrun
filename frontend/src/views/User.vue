@@ -19,7 +19,7 @@
 				<el-button type="primary" @click="submitForm"  icon="el-icon-refresh"> 查询</el-button>
 			</span>
   </div>
-  <el-button @click="clickAdd"  plain type="success" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">新增用户</el-button>
+  <el-button @click="clickAdd"  plain type="success" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">新增</el-button>
   <el-button @click="clickAddPro"  plain type="primary" icon="el-icon-plus" style="margin-bottom: 5px;margin-left:10px">添加其他项目成员</el-button>
 
   <el-dialog v-model="addProDlg" title="添加其他项目成员"  width="30%" custom-class="class_dialog" :required="true" style="text-align:left" :before-close="clearValidation">
@@ -29,14 +29,14 @@
       </el-form-item>
 
       <el-form-item label="选择用户">
-				<el-select  multiple v-model="addProForm.users" placeholder="请选择用户" style="width: 100%;">
+				<el-select  multiple v-model="addProForm.users" filterable placeholder="请选择用户" style="width: 100%;">
           <el-option  :label="iter.username" :value="iter.id" v-for="iter in usersExclude" :key="iter.id"></el-option>
 				</el-select>
 			</el-form-item>
 		</el-form>
 		<template #footer>
 			<span class="dialog-footer">
-				<el-button @click="clearValidation" size="medium">取消</el-button>
+        <el-button @click="clearValidation" size="medium">取消</el-button>
 				<el-button type="primary" @click="clickExcludeUser" size="medium">确定</el-button>
 			</span>
 		</template>
@@ -118,11 +118,11 @@
               </span>
             </template>
             </el-table-column>
-            <el-table-column label="创建时间" align="center">
-            <template #default="scope">
-              {{ $tools.rTime(scope.row.date_joined) }}
-            </template>
-            </el-table-column>
+<!--            <el-table-column label="创建时间" align="center">-->
+<!--            <template #default="scope">-->
+<!--              {{ $tools.rTime(scope.row.date_joined) }}-->
+<!--            </template>-->
+<!--            </el-table-column>-->
             <el-table-column label="操作" width="180" align="center">
               <template #default="scope">
                 <el-button @click="clickEdit(scope.row)" size="mini" plain type="primary" icon="el-icon-edit-outline">编辑</el-button>
@@ -152,7 +152,6 @@
 
 <script>
 import {mapGetters, mapState} from "vuex";
-import Interface from "@/views/Interface";
 
 export default {
   data() {
@@ -284,7 +283,16 @@ export default {
     },
 
     async clickExcludeUser() {
-      console.log(this.addProForm)
+      const params = {...this.addProForm}
+      const response = await this.$api.addExcludeUser(params)
+        if (response.status===200) {
+          this.$message({
+            type: 'success',
+            message: '用户添加成功',
+            duration: 1000})
+          this.addProDlg = false;
+          this.getAllUser(1,this.Pager.size)
+          }
     },
     resetForm() {
       // 重置表单逻辑
@@ -455,7 +463,7 @@ created() {
 <style scoped>
 
 .box{
-  padding:20px;
+  padding:5px;
 }
 .query_model{
   height: 70px;

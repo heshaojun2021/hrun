@@ -19,7 +19,7 @@
                   </div>
                   <div style="color: #fff;margin-top: 10px;">
                       没有账号?
-                      <span @click="clickRegister" style="color:#1296db;cursor:pointer;">去注册</span>
+                      <span @click="clickRegister(activeName)" style="color:#1296db;cursor:pointer;">去注册</span>
                   </div>
               </div>
               <!-- 按钮 -->
@@ -36,6 +36,17 @@
               <el-form-item>
                 <el-input clearable :readonly="readonlyInput" @focus="cancelReadOnly"  type="password" size="default" v-model="createForm.password" placeholder="请输入密码" prefix-icon="el-icon-lock" show-password></el-input>
               </el-form-item>
+              <div style="display: flex; justify-content: space-between;">
+                  <div>
+                      <el-form-item size="mini" label="记住用户" style="margin-top: 6px;">
+                          <el-switch v-model="status" size="default" active-color="#1296db"></el-switch>
+                      </el-form-item>
+                  </div>
+                  <div style="color: #fff;margin-top: 10px;">
+                      已有账号?
+                      <span @click="clickRegister(activeName)" style="color:#1296db;cursor:pointer;">去登录</span>
+                  </div>
+              </div>
               <el-form-item >
                 <el-button size="default" type="primary" style="width: 100%" @click="createClick">注&nbsp;&nbsp; 册</el-button>
               </el-form-item>
@@ -111,8 +122,12 @@ export default {
 		};
 	},
 	methods: {
-		clickRegister() {
-      this.activeName = 'second'
+		clickRegister(activeName) {
+		  if (activeName ==='first') {
+        this.activeName = 'second'
+      }else {
+		    this.activeName = 'first'
+      }
 		},
     cancelReadOnly() {
       this.readonlyInput = false;
@@ -150,12 +165,11 @@ export default {
 				// 判断是否登录失败
 				if (response.status != 200) return;
 				const result = response.data;
-				// 1、弹出登录成功
-				this.$message({
-					type: 'success',
-					message: '登录成功',
-					duration: 1000
-				});
+        ElNotification({
+              duration: 1000,
+              title: '登录成功',
+              type: 'success',
+            })
 				// 2、获取token,保存到客户端的sessionStorage中
         // 保存用户头像到sessionStorage
         this.userAvatar()
@@ -185,8 +199,8 @@ export default {
 	/* 登录框的样式 */
 	.login_box {
 		color: #fff;
-		width: 400px;
-		padding-top: 150px;
+		width: 500px;
+		padding-top: 100px;
 		margin: 0 auto;
 
 	}
@@ -194,7 +208,7 @@ export default {
 	/* logo居中 */
 	.logo_box {
 		text-align: center;
-    height: 100px;
+    height: 130px;
 	}
 
 /deep/ .el-tabs__item {
@@ -209,6 +223,6 @@ export default {
     font-size: 18px;
     font-weight: 500;
     position: relative;
-    width: 200px;
+    width: 250px;
 }
 </style>
