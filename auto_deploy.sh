@@ -4,6 +4,8 @@ echo $project
 
 # 检查容器是否在运行
 check_running_containers(){
+    # 检查并删除镜像名称为空的镜像
+    check_and_delete_empty_images
     echo "检查容器是否在运行..."
     running_containers=$(docker ps -q --filter="name=$project")
     if [ -n "$running_containers" ]; then
@@ -14,6 +16,19 @@ check_running_containers(){
         delete_stopped_containers
         echo "已删除已停止的容器，现在开始部署项目"
         deploy
+    fi
+}
+
+# 检查并删除镜像名称为空的镜像
+check_and_delete_empty_images(){
+    echo "检查是否有镜像名称为空的脏镜像..."
+    dirty_images=$(docker images -qf "dangling=true")
+    if [ -n "$dirty_images" ]; then
+        echo "发现镜像名称为空的脏镜像，将它们删除..."
+        docker rmi $dirty_images
+        echo "已删除镜像名称为空的脏镜像"
+    else
+        echo "没有发现镜像名称为空的脏镜像"
     fi
 }
 
