@@ -42,7 +42,10 @@ class UserViewSet(ModelViewSet):
     def exclude_project(self, request):
         queryset = super().get_queryset()
         project_id = request.query_params.get('project')
+        # 排除特定项目的用户
         queryset = queryset.exclude(project=project_id)
+        # 排除超级用户admin
+        queryset = queryset.exclude(username='admin')
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
