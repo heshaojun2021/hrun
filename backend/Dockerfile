@@ -1,7 +1,7 @@
 # 从哪个镜像开始构建
 FROM python:3.9.7-alpine
 # 注释标签
-LABEL maintainer='wcfdehao'
+LABEL maintainer='heshaojun'
 LABEL description='Django project'
 
 # 创建/app目录并切换进目录下
