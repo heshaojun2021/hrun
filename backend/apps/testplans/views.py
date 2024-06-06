@@ -311,6 +311,14 @@ class StepControllerViewSet(ModelViewSet):
     serializer_class = StepControllerSerializer
     permission_classes = [IsAuthenticated]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        serializer.data["setpId"] = '他的中间表id'
+        # 获取创建成功后的对象
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     @action(methods=['put'], detail=False)
     def batch_updateStep(self, request, *args, **kwargs):
         try:

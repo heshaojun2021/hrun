@@ -533,24 +533,27 @@ export default {
         return true
       };
   },
-  async copyTree(data) {
+  async copyTree(data, parentId= null) {
     event.stopPropagation();
     let order_s = this.steps.length > 0 ? this.steps.length + 1 : 1;
       if (data.stepInfo.type==='api'){
-      const response = await this.$api.createTestCaseStep({ case: this.case.id, interfaceStep:data.interfaceStep, sort: order_s, parent_id:data.parent_id })
+      const response = await this.$api.createTestCaseStep({ case: this.case.id, interfaceStep:data.interfaceStep, sort: order_s, parent_id:parentId })
         if (response.status === 201) {
           this.getCaseStep(this.case.id)
-              }
+        }
     }
     else {
       const Controllerresponse = await this.$api.createStepControll(data.stepInfo)
-        if (Controllerresponse.status === 201) {
-              const response = await this.$api.createTestCaseStep({ case: this.case.id, controllerStep:Controllerresponse.data.id, sort: order_s,  parent_id:data.parent_id })
+              const controllerStepTd = Controllerresponse.data.id
+              // 递归复制子节点
+              for (const child of data.children) {
+                await this.copyTree(child, controllerStepTd); // 递归调用 copyTree 函数
+              }
+              const response = await this.$api.createTestCaseStep({ case: this.case.id, controllerStep:controllerStepTd, sort: order_s,  parent_id:parentId })
                 if (response.status === 201) {
                   this.getCaseStep(this.case.id)
                 }
             }
-    }
   },
   async delTree(data) {
     event.stopPropagation();
