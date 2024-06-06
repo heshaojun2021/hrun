@@ -9,8 +9,8 @@ import 'nprogress/nprogress.css'
 
 // 设置后台域名
 // axios.defaults.baseURL = 'http://172.28.25.61:8002'
-// axios.defaults.baseURL = 'http://127.0.0.1:8000'
-axios.defaults.baseURL = 'http://139.9.38.166:5001'
+axios.defaults.baseURL = 'http://127.0.0.1:8000'
+// axios.defaults.baseURL = 'http://139.9.38.166:5001'
 axios.defaults.timeout = 80000    //请求超时
 axios.defaults.validateStatus = function(status) {
 	return true

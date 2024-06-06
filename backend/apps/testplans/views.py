@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 
@@ -315,10 +316,14 @@ class StepControllerViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        serializer.data["setpId"] = '他的中间表id'
-        # 获取创建成功后的对象
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        step_id = serializer.instance.id
+        SetpCase = CaseStepData.objects.filter(controllerStep_id=step_id)
+        print(SetpCase, SetpCase.query)
+        # serializer.instance.setpId = SetpCase
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     @action(methods=['put'], detail=False)
     def batch_updateStep(self, request, *args, **kwargs):
         try:

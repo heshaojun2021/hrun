@@ -118,11 +118,12 @@ class NestTestCaseSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'url', 'type', 'method']
 
 class StepControllerSerializer(serializers.ModelSerializer):
-    setpId = serializers.IntegerField(read_only=True)
+    setpId = serializers.CharField(label='步骤id', help_text='步骤id', read_only=True, default=None)
     """步骤控制器序列化器"""
     class Meta:
         model = StepController
-        fields = ['id', 'name', 'content', 'type', 'desc', 'script', 'creator', 'dlg', 'inputDlg','setpId']
+        fields = '__all__'
+        # fields = ['id', 'name', 'content', 'type', 'desc', 'script', 'creator', 'dlg', 'inputDlg', 'setpId']
         read_only_fields = ['dlg', 'inputDlg']
 
 
