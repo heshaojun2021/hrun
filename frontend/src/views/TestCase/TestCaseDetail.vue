@@ -9,6 +9,8 @@
             </span>
           </div>
           <div>
+            <el-button v-if="!isExpand" style="margin-right: 10px" icon="el-icon-sort" type="primary" @click="rowOpenORFold(true)" round>展开全部</el-button>
+            <el-button v-if="isExpand" style="margin-right: 10px" icon="el-icon-sort" type="primary" @click="rowOpenORFold(false)" round>折叠全部</el-button>
             <el-dropdown style="margin-right: 10px" trigger="click">
               <el-button type="warning" round >添加步骤
                  <i class="el-icon-arrow-down el-icon--right"></i>
@@ -75,7 +77,8 @@
         :data="steps"
         :props="defaultProps"
         draggable
-        :default-expand-all="false"
+        :key="treeKey"
+			  :default-expand-all="isExpand"
         :expand-on-click-node="false"
         @node-click="handleStepClick"
         :allow-drop="allowDrop"
@@ -388,6 +391,8 @@ export default {
           { value: 'notEmpty', label: '非空' }
         ],
       test:'',
+      treeKey: '',
+      isExpand: false
       }
     },
 
@@ -533,28 +538,37 @@ export default {
         return true
       };
   },
-  async copyTree(data, parentId= null) {
-    event.stopPropagation();
-    let order_s = this.steps.length > 0 ? this.steps.length + 1 : 1;
-      if (data.stepInfo.type==='api'){
-      const response = await this.$api.createTestCaseStep({ case: this.case.id, interfaceStep:data.interfaceStep, sort: order_s, parent_id:parentId })
-        if (response.status === 201) {
-          this.getCaseStep(this.case.id)
-        }
+async copyTree(data, parentId = null, isLastCall = true) {
+  event.stopPropagation();
+  let order_s = this.steps.length > 0 ? this.steps.length + 1 : 1;
+
+  // if (data.parent_id) {
+  //       parentId = data.parent_id;
+  //   }
+  if (data.stepInfo.type === 'api') {
+    await this.$api.createTestCaseStep({ case: this.case.id, interfaceStep: data.interfaceStep, sort: order_s, parent_id: parentId });
+  } else {
+    data.stepInfo.case = this.case.id;
+    data.stepInfo.sort = order_s;
+    data.stepInfo.parent_id = parentId;
+    const Controllerresponse = await this.$api.copyStepControll(data.stepInfo);
+    const setpId = Controllerresponse.data.setpId;
+    // 递归复制子节点
+    if (data.children) {
+      let childCalls = data.children.map((child, index) => {
+        const isLast = isLastCall && index === data.children.length - 1; // 是否为最后一次调用
+        return this.copyTree(child, setpId, isLast); // 递归调用 copyTree 函数
+      });
+      await Promise.all(childCalls); // 等待所有子节点的递归调用完成
     }
-    else {
-      const Controllerresponse = await this.$api.createStepControll(data.stepInfo)
-              const controllerStepTd = Controllerresponse.data.id
-              // 递归复制子节点
-              for (const child of data.children) {
-                await this.copyTree(child, controllerStepTd); // 递归调用 copyTree 函数
-              }
-              const response = await this.$api.createTestCaseStep({ case: this.case.id, controllerStep:controllerStepTd, sort: order_s,  parent_id:parentId })
-                if (response.status === 201) {
-                  this.getCaseStep(this.case.id)
-                }
-            }
-  },
+  }
+
+  // 所有递归调用完成后再刷新页面
+  if (isLastCall) {
+    this.getCaseStep(this.case.id);
+  }
+},
+
   async delTree(data) {
     event.stopPropagation();
     if (data.stepInfo.type==='api'){
@@ -797,6 +811,11 @@ export default {
               }
           }
     },
+
+  rowOpenORFold(isExpand) {
+	      this.treeKey = +new Date()
+	      this.isExpand = isExpand
+	    },
 
   },
   created() {

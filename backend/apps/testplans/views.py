@@ -312,18 +312,27 @@ class StepControllerViewSet(ModelViewSet):
     serializer_class = StepControllerSerializer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False)
+    def copyStep(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        instance = serializer.save()
+        parent = CaseStepData.objects.filter(id=request.data.get('parent_id')).first()
+        if parent:
+            SetpCase = CaseStepData.objects.create(case_id=request.data.get('case'),
+                                                   sort=request.data.get('sort'),
+                                                   controllerStep_id=instance.id,
+                                                   parent_id=parent)
+        else:
+            SetpCase = CaseStepData.objects.create(case_id=request.data.get('case'),
+                                                   sort=request.data.get('sort'),
+                                                   controllerStep_id=instance.id)
 
-        step_id = serializer.instance.id
-        SetpCase = CaseStepData.objects.filter(controllerStep_id=step_id)
-        print(SetpCase, SetpCase.query)
-        # serializer.instance.setpId = SetpCase
+        serializer.instance.setpId = SetpCase.id
+
         headers = self.get_success_headers(serializer.data)
-
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     @action(methods=['put'], detail=False)
     def batch_updateStep(self, request, *args, **kwargs):
         try:

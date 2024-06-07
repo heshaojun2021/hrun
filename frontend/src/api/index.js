@@ -576,6 +576,10 @@ export default {
 	createStepControll(params) {
 		return axios.post('/StepControll/', params)
 	},
+	// copy步骤
+	copyStepControll(params) {
+		return axios.post('/StepControll/copyStep/', params)
+	},
 	// 删除控制器步骤
 	delStepControll(id) {
 		return axios.delete(`/StepControll/${id}/`)
