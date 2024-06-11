@@ -323,9 +323,10 @@ class BaseTest(unittest.TestCase, CaseRunLog):
         datas = data.get('content')
         for index, case_ in enumerate(data.get('children')):
             self.info_log("🔄次数循环---> 开始")
-            for i in range(min(int(datas.get('cycleIndex', 1)), 1000)):
+            cycle_index = datas.get('cycleIndex', None) or 0
+            for i in range(min(int(cycle_index), 1000)):
                 try:
-                    time.sleep(int(datas.get('cycleInterval', 0)))
+                    time.sleep(int(datas.get('cycleInterval', None) or 0))
                     self.info_log(f"次数循环---> 第{i + 1}次，执行间隔时间为 {datas.get('cycleInterval',0)}S")
                     # 递归处理子节点
                     self.handle_step(case_)
