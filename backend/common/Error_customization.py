@@ -5,7 +5,7 @@ from rest_framework.exceptions import APIException
 
 
 class CustomException(APIException):
-    status_code = 400
+    status_code = 500
     default_detail = '删除失败，请检查相关引用!'
     default_code = 'invalid'
 

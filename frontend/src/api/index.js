@@ -64,7 +64,7 @@ axios.interceptors.response.use(function(response) {
 		});
 	} else if (response.status === 400) {
 		ElMessage({
-			message: response.data,
+			message: response.data.message,
 			type: 'warning',
 			duration: 1000
 		});
