@@ -30,7 +30,11 @@
 
       <el-form-item label="选择用户">
 				<el-select  multiple v-model="addProForm.users" filterable placeholder="请选择用户" style="width: 100%;">
-          <el-option  :label="iter.username" :value="iter.id" v-for="iter in usersExclude" :key="iter.id"></el-option>
+          <el-option
+              :value="iter.id" v-for="iter in usersExclude"
+              :label="iter.username"
+              :key="iter.id">
+          </el-option>
 				</el-select>
 			</el-form-item>
 		</el-form>
