@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -16,7 +18,6 @@ from .serializers import MyTokenSerializer, MyRefreshTokenSerializer, UserRegist
 class LoginView(TokenObtainPairView):
     """登录视图"""
     serializer_class = MyTokenSerializer
-
 
 class RefreshTokenView(TokenRefreshView):
     """token刷新视图"""

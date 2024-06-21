@@ -51,7 +51,7 @@
     </el-col>
     </el-row>
     <el-row :gutter="24" style="margin-bottom: 20px">
-    <el-col :span="8">
+    <el-col :span="7">
       <el-form-item label="节点/模块">
         <el-cascader
             v-model="caseInfo.treenode"
@@ -66,7 +66,7 @@
         />
       </el-form-item>
     </el-col>
-    <el-col :span="8">
+    <el-col :span="9">
       <el-form-item label="接口名称" prop="name" >
         <el-input v-model="caseInfo.name" placeholder="请输入接口名称" clearable style="width: 200px"/>
       </el-form-item>
@@ -79,12 +79,12 @@
       </el-select>
     </el-form-item>
     </el-col>
-    <el-col :span="11">
+    <el-col :span="12">
       <el-form-item label="描述">
         <el-input v-model="caseInfo.desc"  type="textarea" clearable style="width: 350px"/>
       </el-form-item>
     </el-col>
-    <el-col :span="10">
+    <el-col :span="12">
     <el-scrollbar height="60px">
       <el-form-item label="接口标签">
       <el-tag
