@@ -91,7 +91,19 @@ td {
     font-size: 14px;
 	line-height: 30px; /* 将行高设置为与容器高度相等 */
 }
-
+/*树节点嵌套样式*/
+.el-tree-node__expand-icon {
+    cursor: pointer;
+    color: #53a8ff;
+    font-size: 12px;
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+    -webkit-transition: -webkit-transform var(--el-transition-duration) ease-in-out;
+    transition: -webkit-transform var(--el-transition-duration) ease-in-out;
+    transition: transform var(--el-transition-duration) ease-in-out;
+    transition: transform var(--el-transition-duration) ease-in-out, -webkit-transform var(--el-transition-duration) ease-in-out;
+    transition: transform var(--el-transition-duration) ease-in-out,-webkit-transform var(--el-transition-duration) ease-in-out;
+}
 
 .el-notification .el-icon-success {
     color: #67c23a;

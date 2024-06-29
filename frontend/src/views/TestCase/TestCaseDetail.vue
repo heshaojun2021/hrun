@@ -11,39 +11,39 @@
           <div>
             <el-button v-if="!isExpand" style="margin-right: 10px" icon="el-icon-sort" type="primary" @click="rowOpenORFold(true)" round>展开全部</el-button>
             <el-button v-if="isExpand" style="margin-right: 10px" icon="el-icon-sort" type="primary" @click="rowOpenORFold(false)" round>折叠全部</el-button>
-            <el-dropdown style="margin-right: 10px" trigger="click">
-              <el-button type="warning" round >添加步骤
-                 <i class="el-icon-arrow-down el-icon--right"></i>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command='api' style="color:#61649f" @click="showApiCite">
-                     <i class="el-icon-connection" style="margin-right: -1px;"></i>
-                    引用接口
-                </el-dropdown-item>
-                <el-dropdown-item command='condition' style="color:#E6A23C" @click="AddController('if')">
-                     <i class="el-icon-share" style="margin-right: -1px;"></i>
-                    条件控制器
-                </el-dropdown-item>
-                <el-dropdown-item command='cyclic' style="color:#02A7F0FF" @click="AddController('for')">
-                     <i class="el-icon-refresh" style="margin-right: -1px;"></i>
-                    循环控制器
-                </el-dropdown-item>
-                <el-dropdown-item command='script' style="color:#7B4D12FF" @click="AddController('script')">
-                     <i class="el-icon-reading" style="margin-right: -1px;"></i>
-                    自定义脚本
-                </el-dropdown-item>
-                <el-dropdown-item command='sql' style="color:#783887FF" @click="AddController('sql')">
-                     <i class="el-icon-coin" style="margin-right: -1px;"></i>
-                    SQL控制器
-                </el-dropdown-item>
-               <el-dropdown-item command='time' style="color:#67C23AFF" @click="AddController('time')">
-                     <i class="el-icon-timer" style="margin-right: -1px;"></i>
-                    等待控制器
-                </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+<!--            <el-dropdown style="margin-right: 10px" trigger="click">-->
+<!--              <el-button type="warning" round >添加步骤-->
+<!--                 <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
+<!--              </el-button>-->
+<!--              <template #dropdown>-->
+<!--                <el-dropdown-menu>-->
+<!--                  <el-dropdown-item command='api' style="color:#61649f" @click="showApiCite">-->
+<!--                     <i class="el-icon-connection" style="margin-right: -1px;"></i>-->
+<!--                    引用接口-->
+<!--                </el-dropdown-item>-->
+<!--                <el-dropdown-item command='condition' style="color:#E6A23C" @click="AddController('if')">-->
+<!--                     <i class="el-icon-share" style="margin-right: -1px;"></i>-->
+<!--                    条件控制器-->
+<!--                </el-dropdown-item>-->
+<!--                <el-dropdown-item command='cyclic' style="color:#02A7F0FF" @click="AddController('for')">-->
+<!--                     <i class="el-icon-refresh" style="margin-right: -1px;"></i>-->
+<!--                    循环控制器-->
+<!--                </el-dropdown-item>-->
+<!--                <el-dropdown-item command='script' style="color:#7B4D12FF" @click="AddController('script')">-->
+<!--                     <i class="el-icon-reading" style="margin-right: -1px;"></i>-->
+<!--                    自定义脚本-->
+<!--                </el-dropdown-item>-->
+<!--                <el-dropdown-item command='sql' style="color:#783887FF" @click="AddController('sql')">-->
+<!--                     <i class="el-icon-coin" style="margin-right: -1px;"></i>-->
+<!--                    SQL控制器-->
+<!--                </el-dropdown-item>-->
+<!--               <el-dropdown-item command='time' style="color:#67C23AFF" @click="AddController('time')">-->
+<!--                     <i class="el-icon-timer" style="margin-right: -1px;"></i>-->
+<!--                    等待控制器-->
+<!--                </el-dropdown-item>-->
+<!--                </el-dropdown-menu>-->
+<!--              </template>-->
+<!--            </el-dropdown>-->
             <el-button  icon="el-icon-bug" type="success" @click="runCase" round>调试</el-button>
             <el-button v-if="this.case" type="primary" @click="editCaseSave" round>保存</el-button>
             <el-button v-else type="primary" @click="addCaseSave" round>保存</el-button>
@@ -71,8 +71,16 @@
     </el-col>
     <!-- 右边内容-->
     <el-col :span="18">
-      <el-scrollbar height="calc(100vh - 100px)">
-      <div style="padding-top: 15px; margin-left: 20px;">
+      <div class="stepStyle" style="">
+        <el-tag class="el-icon-plus" color="#61649f" style="margin-right: 10px" @click="showApiCite">HTTP请求</el-tag>
+        <el-tag class="el-icon-plus" color="#E6A23C" style="margin-right: 10px" @click="AddController('if')">条件控制器</el-tag>
+        <el-tag class="el-icon-plus" color="#02A7F0FF" style="margin-right: 10px" @click="AddController('for')">循环控制器</el-tag>
+        <el-tag class="el-icon-plus" color="#7B4D12FF" style="margin-right: 10px" @click="AddController('script')">自定义脚本</el-tag>
+        <el-tag class="el-icon-plus" color="#783887FF" style="margin-right: 10px" @click="AddController('sql')">SQL控制器</el-tag>
+        <el-tag class="el-icon-plus" color="#67C23AFF" style="margin-right: 10px" @click="AddController('time')">等待控制器</el-tag>
+      </div>
+      <el-scrollbar height="calc(100vh - 155px)">
+      <div style="margin-left: 20px;">
       <el-tree
         :data="steps"
         :props="defaultProps"
@@ -86,7 +94,8 @@
         :node-drag-start="handleDragScroll"
       >
     <template v-slot="{ node,data }">
-      <el-card  v-if="data.stepInfo" :style="getRowClassName(data.stepInfo.type)">
+<!--  <el-checkbox v-model="data.checked" @change="handleCheckboxChange(data)" />-->
+      <el-card  v-if="data.stepInfo">
         <div slot="header" >
           <el-col :span="20">
             <div class="style">
@@ -94,25 +103,25 @@
               <div v-if="data.stepInfo.type==='api'">
               <span  slot="header" class="card-title">
                   <div style="font-weight: bold;margin-top: -9px">
-                    <span class="icon" style="color: rgb(97, 100, 159);background-color:#e9eef3;">{{ getCardIndex(node.parent, node) }}</span>
-                   <i class="el-icon-connection" style="color:#61649f;margin-right: 20px"></i>
+                    <span class="icon" style="color: rgb(97, 100, 159)">{{ getCardIndex(node.parent, node) }}</span>
+                    <el-tag color="#61649f" style="margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">HTTP请求</el-tag>
                     <span v-if="data.stepInfo.method === 'POST'">
-                        <el-tag  color="#49cc90" size="large">{{ data.stepInfo.method }}</el-tag>
+                      <b style="color: #49cc90;font-size: 15px">{{ data.stepInfo.method }}</b>
                     </span>
                     <span v-if="data.stepInfo.method === 'GET'">
-                      <el-tag  color="#61affe" size="large">{{data.stepInfo.method}}</el-tag>
+                      <b style="color: #61affe;font-size: 15px">{{ data.stepInfo.method }}</b>
                     </span>
                     <span v-if="data.stepInfo.method === 'PUT'">
-                      <el-tag  color="#fca130" size="large">{{ data.stepInfo.method}}</el-tag>
+                      <b style="color: #fca130;font-size: 15px">{{ data.stepInfo.method }}</b>
                     </span>
                     <span v-if="data.stepInfo.method === 'PATCH'">
-                      <el-tag   color="#50e3c2" size="large">{{ data.stepInfo.method}}</el-tag>
+                      <b style="color: #50e3c2;font-size: 15px">{{ data.stepInfo.method }}</b>
                     </span>
                     <span v-if="data.stepInfo.method === 'DELETE'">
-                      <el-tag  color="#f93e3e" size="large">{{ data.stepInfo.method}}</el-tag>
+                      <b style="color: #f93e3e;font-size: 15px">{{ data.stepInfo.method }}</b>
                     </span>
                     <span v-if="data.stepInfo.method === 'DEAD'">
-                      <el-tag color="rgb(201, 233, 104)" size="large">{{data.stepInfo.method}}</el-tag>
+                      <b style="color: rgb(201, 233, 104);font-size: 15px">{{ data.stepInfo.method }}</b>
                     </span>
                   </div>
                     <b class="card-url">{{ data.stepInfo.url  }}</b>
@@ -124,10 +133,10 @@
               <div v-if="data.stepInfo.type==='if'">
               <span slot="header" class="card-title">
                 <div style="margin-top: -9px">
-                  <span class="icon" style="color: rgb(230, 162, 60);background-color:rgb(252, 246, 238);">{{ getCardIndex(node.parent, node) }}</span>
-                  <i class="el-icon-share" style="color:rgb(230, 162, 60);margin-right: 20px"></i>
+                  <span class="icon" style="color: rgb(230, 162, 60);">{{ getCardIndex(node.parent, node) }}</span>
+                  <el-tag color="rgb(230, 162, 60)" style="font-weight: bold; margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">条件控制器</el-tag>
                   <span>
-                    <input class="input-def" placeholder="变量，例如{{name}}" v-model="data.stepInfo.content.variable">
+                    <el-input class="input-def" placeholder="变量，例如{{name}}" v-model="data.stepInfo.content.variable"/>
                     <el-select v-model="data.stepInfo.content.JudgmentMode" placeholder="请选择" size="small" style="margin-right: 8px;width: 100px">
                         <el-option
                           v-for="item in options"
@@ -136,8 +145,8 @@
                           :value="item.value"
                         />
                     </el-select>
-                    <input class="input-def" placeholder="值" v-model="data.stepInfo.content.value">
-                    <input class="input-def" placeholder="备注"  v-model="data.stepInfo.desc">
+                    <el-input class="input-def" placeholder="值" v-model="data.stepInfo.content.value"/>
+                    <el-input class="input-def" placeholder="备注"  v-model="data.stepInfo.desc"/>
                   </span>
                 </div>
               </span>
@@ -147,13 +156,13 @@
               <div v-if="data.stepInfo.type==='for'" >
               <span slot="header" class="card-title" >
                 <div style="margin-top: -12px">
-                  <span class="icon" style="color: rgb(2, 167, 240);background-color:rgb(244, 244, 245);">{{ getCardIndex(node.parent, node) }}</span>
-                  <i class="el-icon-refresh" style="color:rgb(2, 167, 240);margin-right: 20px"></i>
+                  <span class="icon" style="color: rgb(2, 167, 240)">{{ getCardIndex(node.parent, node) }}</span>
+                  <el-tag color="rgb(2, 167, 240)" style="font-weight: bold; margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">循环控制器</el-tag>
                   <el-button @click="toggleExpand(data.stepInfo)"
                              type="text"
                              style="margin-right: 10px;">
                     <el-icon v-if=" data.stepInfo.dlg">
-                      <ArrowDown />
+                      <ArrowDown/>
                     </el-icon>
                   <el-icon v-else>
                     <ArrowRight />
@@ -206,9 +215,9 @@
               <div v-if="data.stepInfo.type==='script'">
               <span slot="header" class="card-title">
                 <div style="margin-top: -9px">
-                  <span class="icon" style="color: rgb(123, 77, 18);background-color:rgb(244, 244, 245);">{{ getCardIndex(node.parent, node) }}</span>
-                  <i class="el-icon-reading" style="color:rgb(123, 77, 18);margin-right: 20px"></i>
-                      <el-input v-if="data.stepInfo.inputDlg" v-model="data.stepInfo.name" @blur="cancelEditing(data.stepInfo)" ref="input" maxlength="50" @click.stop></el-input>
+                  <span class="icon" style="color: rgb(123, 77, 18)">{{ getCardIndex(node.parent, node) }}</span>
+                  <el-tag color="rgb(123, 77, 18)" style="font-weight: bold; margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">自定义脚本</el-tag>
+                   <el-input v-if="data.stepInfo.inputDlg" v-model="data.stepInfo.name" @blur="cancelEditing(data.stepInfo)" ref="input" maxlength="50" @click.stop></el-input>
                       <el-button v-else class="script-button" plain type="text" @click="startEditing(data.stepInfo)" @click.stop>{{data.stepInfo.name}} <i class="el-icon-edit"></i></el-button>
                   </div>
               </span>
@@ -228,8 +237,8 @@
               <div v-if="data.stepInfo.type==='sql'">
               <span slot="header" class="card-title">
                 <div style="margin-top: -9px">
-                  <span class="icon" style="color: rgb(120, 56, 135);background-color:rgb(242, 236, 243);">{{ getCardIndex(node.parent, node) }}</span>
-                  <i class="el-icon-coin" style="color:rgb(120, 56, 135);margin-right: 20px"></i>
+                  <span class="icon" style="color: rgb(120, 56, 135)">{{ getCardIndex(node.parent, node) }}</span>
+                  <el-tag color="rgb(120, 56, 135)" style="font-weight: bold; margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">SQL控制器</el-tag>
                   <el-input v-if="data.stepInfo.inputDlg" v-model="data.stepInfo.name" @blur="cancelEditing(data.stepInfo)" ref="input" maxlength="50" @click.stop></el-input>
                   <el-button v-else class="script-button" plain type="text" @click="startEditing(data.stepInfo)" @click.stop>{{data.stepInfo.name}} <i class="el-icon-edit"></i></el-button>
                 </div>
@@ -241,8 +250,8 @@
               <div v-if="data.stepInfo.type==='time'">
               <span slot="header" class="card-title">
                 <div style="margin-top: -9px">
-                  <span class="icon" style="color: rgb(103, 194, 58);background-color:rgb(242, 249, 238);">{{ getCardIndex(node.parent, node) }}</span>
-                  <i class="el-icon-timer" style="color:rgb(103, 194, 58);margin-right: 20px"></i>
+                  <span class="icon" style="color: rgb(103, 194, 58)">{{ getCardIndex(node.parent, node) }}</span>
+                  <el-tag color="rgb(103, 194, 58)" style="font-weight: bold; margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">等待控制器</el-tag>
                     <el-input-number
                       v-model="data.stepInfo.content.time"
                       :min="0"
@@ -252,12 +261,12 @@
                       placeholder="秒"
                     >
                     </el-input-number>
-                  <span style="margin-left: 10px">s</span>
+                  <span style="margin-left: 10px">秒</span>
                 </div>
               </span>
             </div>
           </div>
-        </el-col>
+          </el-col>
           <el-col :span="4">
             <span class="card-content" >
             <el-switch
@@ -274,7 +283,6 @@
         </div>
       </el-card>
     </template>
-
       </el-tree>
       </div>
       </el-scrollbar>
@@ -835,6 +843,10 @@ async copyTree(data, parentId = null, isLastCall = true) {
     background-color: #ebf5ff;
   }
 }
+.el-tree {
+    --el-tree-node-hover-background-color: #ecf5ff;
+    width: 1050px;
+}
 .tree-component {
   height: 100vh;
   margin-left: 15px;
@@ -844,10 +856,9 @@ async copyTree(data, parentId = null, isLastCall = true) {
 }
 
 /deep/ .el-tree-node__content {
-    padding: 0px 50px 6px 0px;
+    padding: 4px 4px 4px 0px;
     height: auto;
 }
-
 
 .style {
     line-height: 12px;
@@ -879,13 +890,12 @@ async copyTree(data, parentId = null, isLastCall = true) {
 }
 .el-tag {
   color: #ffffff;
-  width:70px;
   height: 30px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 30px;
-}
 
+}
 .icon {
   display: inline-block;
   width: 28px;
@@ -928,5 +938,18 @@ async copyTree(data, parentId = null, isLastCall = true) {
 }
 .code_mod {
 	margin-bottom: 5px;
+}
+.el-card {
+  border-radius: 10px;
+}
+
+.stepStyle{
+  margin-top: 15px;
+  margin-left: 45px;
+  margin-bottom: 10px;
+  cursor: pointer
+}
+.custom-button .el-icon {
+  margin-top: 10px; /* 调整箭头图标向下的距离 */
 }
 </style>
