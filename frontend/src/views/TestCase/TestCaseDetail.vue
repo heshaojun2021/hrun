@@ -71,13 +71,13 @@
     </el-col>
     <!-- 右边内容-->
     <el-col :span="18">
-      <div class="stepStyle" style="">
-        <el-tag class="el-icon-plus" color="#61649f" style="margin-right: 10px" @click="showApiCite">HTTP请求</el-tag>
-        <el-tag class="el-icon-plus" color="#E6A23C" style="margin-right: 10px" @click="AddController('if')">条件控制器</el-tag>
-        <el-tag class="el-icon-plus" color="#02A7F0FF" style="margin-right: 10px" @click="AddController('for')">循环控制器</el-tag>
-        <el-tag class="el-icon-plus" color="#7B4D12FF" style="margin-right: 10px" @click="AddController('script')">自定义脚本</el-tag>
-        <el-tag class="el-icon-plus" color="#783887FF" style="margin-right: 10px" @click="AddController('sql')">SQL控制器</el-tag>
-        <el-tag class="el-icon-plus" color="#67C23AFF" style="margin-right: 10px" @click="AddController('time')">等待控制器</el-tag>
+      <div class="stepStyle">
+        <el-tag class="el-icon-plus" color="#61649f" style="margin-right: 10px;width: 100px" @click="showApiCite">HTTP请求</el-tag>
+        <el-tag class="el-icon-plus" color="#E6A23C" style="margin-right: 10px;width: 100px" @click="AddController('if')">条件控制器</el-tag>
+        <el-tag class="el-icon-plus" color="#02A7F0FF" style="margin-right: 10px;width: 100px" @click="AddController('for')">循环控制器</el-tag>
+        <el-tag class="el-icon-plus" color="#7B4D12FF" style="margin-right: 10px;width: 100px" @click="AddController('script')">自定义脚本</el-tag>
+        <el-tag class="el-icon-plus" color="#783887FF" style="margin-right: 10px;width: 100px" @click="AddController('sql')">SQL控制器</el-tag>
+        <el-tag class="el-icon-plus" color="#67C23AFF" style="margin-right: 10px;width: 100px" @click="AddController('time')">等待控制器</el-tag>
       </div>
       <el-scrollbar height="calc(100vh - 155px)">
       <div style="margin-left: 20px;">
@@ -890,6 +890,7 @@ async copyTree(data, parentId = null, isLastCall = true) {
 }
 .el-tag {
   color: #ffffff;
+  width: 80px;
   height: 30px;
   text-align: center;
   font-size: 13px;
