@@ -30,7 +30,7 @@
         <el-option v-for="item in testEnvs" :key="item.id" :label="item.name" :value="item.id" />
       </el-select>
 			<el-tooltip v-if="env" class="box-item" effect="dark" content="查看环境信息" placement="bottom">
-				<el-button @click="clickShowEnv" icon="el-icon-view"></el-button>
+				<el-button style="margin-left: 5px" @click="clickShowEnv" icon="el-icon-view"></el-button>
 			</el-tooltip>
 		</div>
 	</div>
