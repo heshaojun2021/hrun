@@ -153,33 +153,33 @@
               </div>
 
               <!--循环控制器展示-->
-              <div v-if="data.stepInfo.type==='for'" >
+              <div v-if="data.stepInfo.type==='for'" @click="toggleExpand(data.stepInfo)">
               <span slot="header" class="card-title" >
                 <div style="margin-top: -12px">
                   <span class="icon" style="color: rgb(2, 167, 240)">{{ getCardIndex(node.parent, node) }}</span>
                   <el-tag color="rgb(2, 167, 240)" style="font-weight: bold; margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">循环控制器</el-tag>
-                  <el-button @click="toggleExpand(data.stepInfo)"
-                             type="text"
-                             style="margin-right: 10px;">
-                    <el-icon v-if=" data.stepInfo.dlg">
-                      <ArrowDown/>
-                    </el-icon>
-                  <el-icon v-else>
-                    <ArrowRight />
-                  </el-icon>
-                  </el-button>
-                  <el-radio-group v-model="data.stepInfo.content.select">
-                    <el-radio label="count" value="count">次数循环</el-radio>
+<!--                  <el-button @click="toggleExpand(data.stepInfo)"-->
+<!--                             type="text"-->
+<!--                             style="margin-right: 10px;">-->
+<!--                    <el-icon v-if=" data.stepInfo.dlg">-->
+<!--                      <ArrowDown/>-->
+<!--                    </el-icon>-->
+<!--                  <el-icon v-else>-->
+<!--                    <ArrowRight />-->
+<!--                  </el-icon>-->
+<!--                  </el-button>-->
+                  <el-radio-group v-model="data.stepInfo.content.select" @click.stop>
+                    <el-radio label="count" value="count" >次数循环</el-radio>
                     <el-radio label="for" value="for">for循环</el-radio>
                     <el-radio label="while" value="while" disabled>while循环</el-radio>
                   </el-radio-group>
                 </div>
               </span>
-              <div v-if="data.stepInfo.dlg" :key="data.id">
+              <div v-if="data.stepInfo.dlg" :key="data.id" @click.stop>
               <div v-if="data.stepInfo.content.select==='count' || data.stepInfo.content.select===''">
                 <div class="loop">
                   <span style="padding-right: 5px">循环次数</span>
-                  <el-input v-model="data.stepInfo.content.cycleIndex" style="width: 200px" placeholder="循环次数"/>
+                  <el-input v-model="data.stepInfo.content.cycleIndex" style="width: 200px" placeholder="循环次数" />
                   <span style="padding-right: 5px;padding-left: 10px">循环间隔</span>
                     <el-input-number
                       v-model="data.stepInfo.content.cycleInterval"
@@ -189,6 +189,7 @@
                       controls-position="right"
                       placeholder="秒"
                     />
+                  <span style="margin-left: 10px">秒</span>
                 </div>
               </div>
               <div v-if="data.stepInfo.content.select==='for'">
@@ -205,6 +206,7 @@
                       controls-position="right"
                       placeholder="秒"
                     />
+                  <span style="margin-left: 10px">秒</span>
                 </div>
               </div>
               <div v-if="data.stepInfo.content.select==='while'" ><div class="loop">敬请期待！</div></div>

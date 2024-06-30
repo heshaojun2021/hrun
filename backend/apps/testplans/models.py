@@ -256,8 +256,8 @@ class TestCase(models.Model):
 class StepController(models.Model):
     """步骤控制器表"""
     name = models.CharField(max_length=50, help_text='步骤控制器名称', verbose_name='步骤控制器名称')
-    dlg = models.BooleanField(default=False, help_text='是否展开', verbose_name='是否展开')
-    inputDlg = models.BooleanField(default=False, help_text='是否展开', verbose_name='是否展开')
+    dlg = models.BooleanField(default=False, help_text='循环控制器是否展开', verbose_name='循环控制器是否展开')
+    inputDlg = models.BooleanField(default=False, help_text='自定义脚本是否展开', verbose_name='自定义脚本是否展开')
     type = models.CharField(max_length=50, help_text='步骤控制器类型', verbose_name='步骤控制器类型')
     content = models.JSONField(help_text='步骤控制器内容', verbose_name='步骤控制器内容', default=dict, blank=True)
     script = models.TextField(help_text='步骤控制器脚本', verbose_name='步骤控制器脚本', default='', null=True, blank=True)
