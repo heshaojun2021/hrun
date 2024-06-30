@@ -71,7 +71,8 @@ class GenerateCase:
             'if': 'if_perform',
             'for': 'loop_perform',
             'script': 'script_perform',
-            'time': 'time_perform'
+            'time': 'time_perform',
+            'sql': 'sql_perform',
         }
 
         # 遍历数据生成,动态添加测试方法
@@ -152,7 +153,8 @@ class BaseTest(unittest.TestCase, CaseRunLog):
         'if': 'if_perform',
         'for': 'loop_perform',
         'script': 'script_perform',
-        'time': 'time_perform'
+        'time': 'time_perform',
+        'sql': 'sql_perform',
     }
     @classmethod
     def setUpClass(cls) -> None:
@@ -272,6 +274,11 @@ class BaseTest(unittest.TestCase, CaseRunLog):
         """执行自定义脚本"""
         if data.get('script'):
             exec(data.get('script', b''), global_func.__dict__)
+
+    # ------------------------------- sql控制器步骤处理逻辑 ---------------------------------
+    def sql_perform(self, data):
+        # todo: 待完成
+        pass
 
 
     # ------------------------------- time时间控制器步骤处理逻辑 ---------------------------------
