@@ -9,8 +9,8 @@
             </span>
           </div>
           <div>
-            <el-button v-if="!isExpand" style="margin-right: 10px" icon="el-icon-sort" type="primary" @click="rowOpenORFold(true)" round>展开全部</el-button>
-            <el-button v-if="isExpand" style="margin-right: 10px" icon="el-icon-sort" type="primary" @click="rowOpenORFold(false)" round>折叠全部</el-button>
+            <el-button v-if="!isExpand" icon="el-icon-sort" type="primary" @click="rowOpenORFold(true)" round>展开全部</el-button>
+            <el-button v-if="isExpand" icon="el-icon-sort" type="primary" @click="rowOpenORFold(false)" round>折叠全部</el-button>
 <!--            <el-dropdown style="margin-right: 10px" trigger="click">-->
 <!--              <el-button type="warning" round >添加步骤-->
 <!--                 <i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
@@ -847,7 +847,7 @@ async copyTree(data, parentId = null, isLastCall = true) {
 }
 .el-tree {
     --el-tree-node-hover-background-color: #ecf5ff;
-    width: 1050px;
+    width: 1200px;
 }
 .tree-component {
   height: 100vh;
@@ -912,16 +912,10 @@ async copyTree(data, parentId = null, isLastCall = true) {
   font-weight: normal;
 }
 .input-def{
-  border: 1px solid #dcdfe6;
-  height: 23px;
-  border-radius: 5px;
-  outline: none; /* 移除默认的聚焦样式 */
+  height: 20px;
   width: 180px;
   margin-right: 8px;
 }
-.input-def:focus {
-            border-color: #409eff; /* 设置边框颜色为蓝色 */
-        }
 
 
 .el-input--small .el-input__inner {
