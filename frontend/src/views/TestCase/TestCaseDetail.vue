@@ -80,7 +80,7 @@
         <el-tag class="el-icon-plus" color="#67C23AFF" style="margin-right: 10px;width: 100px" @click="AddController('time')">等待控制器</el-tag>
       </div>
       <el-scrollbar height="calc(100vh - 155px)">
-      <div style="margin-left: 20px;">
+      <div style="margin-left: 20px">
       <el-tree
         :data="steps"
         :props="defaultProps"
@@ -847,7 +847,7 @@ async copyTree(data, parentId = null, isLastCall = true) {
 }
 .el-tree {
     --el-tree-node-hover-background-color: #ecf5ff;
-    width: 1200px;
+    margin-right: 50px;
 }
 .tree-component {
   height: 100vh;
