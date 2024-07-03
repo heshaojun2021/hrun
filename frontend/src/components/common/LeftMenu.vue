@@ -115,6 +115,11 @@ const submenuList = [
 		path: '/users',
 		icon: 'el-icon-user'
 	},
+  {
+		name: '需求问题记录表',
+		path: '/excel',
+		icon: 'el-icon-collection-tag'
+	},
 
 ];
 

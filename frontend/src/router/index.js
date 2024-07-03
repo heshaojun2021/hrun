@@ -60,6 +60,10 @@ const routes = [{
             path: '/users', name: 'user', component: () => import('../views/User.vue'), meta: {
                 name: "用户管理"
             }
+        }, {
+            path: '/excel', name: 'excel', component: () => import('../views/excel.vue'), meta: {
+                name: "需求问题记录表"
+            }
         },{
             path: '/reportPush', name: 'push', component: () => import('../views/Reports/ReportPush.vue'), meta: {
                 name: "报告通知"
