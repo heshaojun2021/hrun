@@ -140,6 +140,7 @@ class newInterface(models.Model):
                                 related_name='new_interface')
     treenode = models.ForeignKey(TreeNode, on_delete=models.CASCADE, help_text='节点id', verbose_name='节点id', related_name='newinterface')
     name = models.CharField(max_length=50, help_text='接口名称', verbose_name='接口名')
+    host = models.CharField(max_length=100, help_text='域名', verbose_name='域名', null=True, blank=True)
     url = models.CharField(max_length=200, help_text='接口路径', verbose_name='接口路径')
     method = models.CharField(max_length=50, help_text='请求方法', verbose_name='请求方法')
     headers = models.JSONField(help_text='请求头', verbose_name='请求头', default=dict, blank=True)

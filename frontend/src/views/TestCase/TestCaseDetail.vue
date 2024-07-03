@@ -105,25 +105,28 @@
                   <div style="font-weight: bold;margin-top: -9px">
                     <span class="icon" style="color: rgb(97, 100, 159)">{{ getCardIndex(node.parent, node) }}</span>
                     <el-tag color="#61649f" style="margin-right: 20px;height: 25px;font-size: 12px;line-height: 25px;">HTTP请求</el-tag>
-                    <span v-if="data.stepInfo.method === 'POST'">
-                      <b style="color: #49cc90;font-size: 15px">{{ data.stepInfo.method }}</b>
-                    </span>
-                    <span v-if="data.stepInfo.method === 'GET'">
-                      <b style="color: #61affe;font-size: 15px">{{ data.stepInfo.method }}</b>
-                    </span>
-                    <span v-if="data.stepInfo.method === 'PUT'">
-                      <b style="color: #fca130;font-size: 15px">{{ data.stepInfo.method }}</b>
-                    </span>
-                    <span v-if="data.stepInfo.method === 'PATCH'">
-                      <b style="color: #50e3c2;font-size: 15px">{{ data.stepInfo.method }}</b>
-                    </span>
-                    <span v-if="data.stepInfo.method === 'DELETE'">
-                      <b style="color: #f93e3e;font-size: 15px">{{ data.stepInfo.method }}</b>
-                    </span>
-                    <span v-if="data.stepInfo.method === 'DEAD'">
-                      <b style="color: rgb(201, 233, 104);font-size: 15px">{{ data.stepInfo.method }}</b>
+                    <span style=" min-width: 60px;display: inline-block;">
+                      <span v-if="data.stepInfo.method === 'POST'">
+                        <b style="color: #49cc90;font-size: 15px">{{ data.stepInfo.method }}</b>
+                      </span>
+                      <span v-if="data.stepInfo.method === 'GET'">
+                        <b style="color: #61affe;font-size: 15px">{{ data.stepInfo.method }}</b>
+                      </span>
+                      <span v-if="data.stepInfo.method === 'PUT'">
+                        <b style="color: #fca130;font-size: 15px">{{ data.stepInfo.method }}</b>
+                      </span>
+                      <span v-if="data.stepInfo.method === 'PATCH'">
+                        <b style="color: #50e3c2;font-size: 15px">{{ data.stepInfo.method }}</b>
+                      </span>
+                      <span v-if="data.stepInfo.method === 'DELETE'">
+                        <b style="color: #f93e3e;font-size: 15px">{{ data.stepInfo.method }}</b>
+                      </span>
+                      <span v-if="data.stepInfo.method === 'DEAD'">
+                        <b style="color: rgb(201, 233, 104);font-size: 15px">{{ data.stepInfo.method }}</b>
+                      </span>
                     </span>
                   </div>
+                  <el-button style="margin-top:-13px;margin-bottom: -2px" type="text" size="max">全局环境</el-button>
                     <b class="card-url">{{ data.stepInfo.url  }}</b>
                     <span class="card-name">{{data.stepInfo.name }}</span>
               </span>

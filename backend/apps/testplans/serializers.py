@@ -115,7 +115,7 @@ class NestTestCaseSerializer(serializers.ModelSerializer):
     """嵌套测试步骤序列化器"""
     class Meta:
         model = newInterface
-        fields = ['id', 'name', 'url', 'type', 'method']
+        fields = ['id', 'name', 'url', 'type', 'method', 'host']
 
 class StepControllerSerializer(serializers.ModelSerializer):
     setpId = serializers.CharField(label='步骤id', help_text='步骤id', read_only=True, default=None)
