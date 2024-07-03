@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkfrontend_web"]=self["webpackChunkfrontend_web"]||[]).push([[570],{29570:function(n,e,t){t.r(e),t.d(e,{default:function(){return l}});var r=t(73396);const c={ref:"externalLink",href:"https://docs.qq.com/sheet/DY2VDZFd5d1B6c2Fr?tab=BB08J2",target:"_blank"};function s(n,e,t,s,u,a){return(0,r.wg)(),(0,r.iD)("div",null,[(0,r._)("a",c,null,512)])}var u={mounted(){const n=this.$refs.externalLink;n&&n.click()}},a=t(40089);const f=(0,a.Z)(u,[["render",s]]);var l=f}}]);
+//# sourceMappingURL=570.b8edb755.js.map
