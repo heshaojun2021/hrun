@@ -126,7 +126,28 @@
                       </span>
                     </span>
                   </div>
-                  <el-button style="margin-top:-13px;margin-bottom: -2px" type="text" size="max">全局环境</el-button>
+
+                  <el-dropdown trigger="click" @click.stop>
+                    <el-tooltip
+                      class="box-item"
+                      effect="dark"
+                      content="这是一个tooltip"
+                      placement="top"
+                    >
+                      <el-button style="margin-top:-13px;margin-bottom: -2px" type="text" size="max" @click.stop>全局环境</el-button>
+                    </el-tooltip>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                          <el-dropdown-item v-for="item in testEnvs" :key="item.id" command='api' @click="envClick()">
+                            {{item.name}}
+                          </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+
+
+
+
+                  </el-dropdown>
                     <b class="card-url">{{ data.stepInfo.url  }}</b>
                     <span class="card-name">{{data.stepInfo.name }}</span>
               </span>
@@ -410,7 +431,7 @@ export default {
     },
 
   computed: {
-		...mapState(['pro','case','envId']),
+		...mapState(['pro','case','envId','testEnvs']),
     username() {
 			return window.sessionStorage.getItem('username');
 		},
@@ -829,6 +850,9 @@ async copyTree(data, parentId = null, isLastCall = true) {
 	      this.treeKey = +new Date()
 	      this.isExpand = isExpand
 	    },
+  envClick(){
+    console.log(this.testEnvs)
+  },
 
   },
   created() {
