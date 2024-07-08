@@ -224,5 +224,10 @@ export default {
     font-weight: 500;
     position: relative;
     width: 250px;
+    color: aliceblue;
+}
+/deep/ .el-form-item__label {
+    color: aliceblue;
+
 }
 </style>

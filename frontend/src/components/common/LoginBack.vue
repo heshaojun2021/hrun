@@ -1,532 +1,501 @@
+
 <template>
-	<div class="waves" id="waves">
-		<div class="box">
-			<slot></slot>
-		</div>
-		
-	</div>
+    <div class="ve_404">
+        <!-- partial:index.partial.html -->
+        <div class="moon"></div>
+        <div class="moon__crater moon__crater1"></div>
+        <div class="moon__crater moon__crater2"></div>
+        <div class="moon__crater moon__crater3"></div>
+        <div class="star star1">⭐</div>
+        <div class="star star2">⭐</div>
+        <div class="star star3">⭐</div>
+        <div class="star star4">⭐</div>
+        <div class="star star5">⭐</div>
+        <slot>
+            <div class="error">
+                <div class="error__title">404</div>
+                <div class="error__subtitle">🐱🐱🐱(⓿_⓿)🐱🐱🐱</div>
+                <div class="error__description">看来你是迷路了......</div>
+                <router-link to="/">
+                    <button class="error__button error__button--active">
+                        回到首页
+                    </button>
+                </router-link>
+                <!-- <button class="error__button">CONTACT</button> -->
+            </div>
+        </slot>
+        <div class="astronaut" v-resize="{ resize: draw3dAstronaut }">
+            <canvas ref="cav"></canvas>
+        </div>
+    </div>
 </template>
 
-<script>
-export default {
-	mounted() {
-		class ShaderProgram {
-			constructor(holder, options = {}) {
-				options = Object.assign(
-					{
-						antialias: false,
-						depthTest: false,
-						mousemove: false,
-						autosize: true,
-						side: 'front',
-						vertex: `
-			        precision highp float;
-			
-			        attribute vec4 a_position;
-			        attribute vec4 a_color;
-			
-			        uniform float u_time;
-			        uniform vec2 u_resolution;
-			        uniform vec2 u_mousemove;
-			        uniform mat4 u_projection;
-			
-			        varying vec4 v_color;
-			
-			        void main() {
-			
-			          gl_Position = u_projection * a_position;
-			          gl_PointSize = (10.0 / gl_Position.w) * 100.0;
-			
-			          v_color = a_color;
-			
-			        }`,
-						fragment: `
-			        precision highp float;
-			
-			        uniform sampler2D u_texture;
-			        uniform int u_hasTexture;
-			
-			        varying vec4 v_color;
-			
-			        void main() {
-			
-			          if ( u_hasTexture == 1 ) {
-			
-			            gl_FragColor = v_color * texture2D(u_texture, gl_PointCoord);
-			
-			          } else {
-			
-			            gl_FragColor = v_color;
-			
-			          }
-			
-			        }`,
-						uniforms: {},
-						buffers: {},
-						camera: {},
-						texture: null,
-						onUpdate: () => {},
-						onResize: () => {}
-					},
-					options
-				);
-
-				const uniforms = Object.assign(
-					{
-						time: { type: 'float', value: 0 },
-						hasTexture: { type: 'int', value: 0 },
-						resolution: { type: 'vec2', value: [0, 0] },
-						mousemove: { type: 'vec2', value: [0, 0] },
-						projection: { type: 'mat4', value: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }
-					},
-					options.uniforms
-				);
-
-				const buffers = Object.assign(
-					{
-						position: { size: 3, data: [] },
-						color: { size: 4, data: [] }
-					},
-					options.buffers
-				);
-
-				const camera = Object.assign(
-					{
-						fov: 60,
-						near: 1,
-						far: 10000,
-						aspect: 1,
-						z: 100,
-						perspective: true
-					},
-					options.camera
-				);
-
-				const canvas = document.createElement('canvas');
-				const gl = canvas.getContext('webgl', { antialias: options.antialias });
-
-				if (!gl) return false;
-
-				this.count = 0;
-				this.gl = gl;
-				this.canvas = canvas;
-				this.camera = camera;
-				this.holder = holder;
-				this.onUpdate = options.onUpdate;
-				this.onResize = options.onResize;
-				this.data = {};
-
-				holder.appendChild(canvas);
-
-				this.createProgram(options.vertex, options.fragment);
-
-				this.createBuffers(buffers);
-				this.createUniforms(uniforms);
-
-				this.updateBuffers();
-				this.updateUniforms();
-
-				this.createTexture(options.texture);
-
-				gl.enable(gl.BLEND);
-				gl.enable(gl.CULL_FACE);
-				gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-				gl[options.depthTest ? 'enable' : 'disable'](gl.DEPTH_TEST);
-
-				if (options.autosize) window.addEventListener('resize', e => this.resize(e), false);
-				if (options.mousemove) window.addEventListener('mousemove', e => this.mousemove(e), false);
-
-				this.resize();
-
-				this.update = this.update.bind(this);
-				this.time = { start: performance.now(), old: performance.now() };
-				this.update();
-			}
-
-			mousemove(e) {
-				let x = (e.pageX / this.width) * 2 - 1;
-				let y = (e.pageY / this.height) * 2 - 1;
-
-				this.uniforms.mousemove = [x, y];
-			}
-
-			resize(e) {
-				const holder = this.holder;
-				const canvas = this.canvas;
-				const gl = this.gl;
-
-				const width = (this.width = holder.offsetWidth);
-				const height = (this.height = holder.offsetHeight);
-				const aspect = (this.aspect = width / height);
-				const dpi = (this.dpi = devicePixelRatio);
-
-				canvas.width = width * dpi;
-				canvas.height = height * dpi;
-				canvas.style.width = width + 'px';
-				canvas.style.height = height + 'px';
-
-				gl.viewport(0, 0, width * dpi, height * dpi);
-				gl.clearColor(0, 0, 0, 0);
-
-				this.uniforms.resolution = [width, height];
-				this.uniforms.projection = this.setProjection(aspect);
-
-				this.onResize(width, height, dpi);
-			}
-
-			setProjection(aspect) {
-				const camera = this.camera;
-
-				if (camera.perspective) {
-					camera.aspect = aspect;
-
-					const fovRad = camera.fov * (Math.PI / 180);
-					const f = Math.tan(Math.PI * 0.5 - 0.5 * fovRad);
-					const rangeInv = 1.0 / (camera.near - camera.far);
-
-					const matrix = [f / camera.aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (camera.near + camera.far) * rangeInv, -1, 0, 0, camera.near * camera.far * rangeInv * 2, 0];
-
-					matrix[14] += camera.z;
-					matrix[15] += camera.z;
-
-					return matrix;
-				} else {
-					return [2 / this.width, 0, 0, 0, 0, -2 / this.height, 0, 0, 0, 0, 1, 0, -1, 1, 0, 1];
-				}
-			}
-
-			createShader(type, source) {
-				const gl = this.gl;
-				const shader = gl.createShader(type);
-
-				gl.shaderSource(shader, source);
-				gl.compileShader(shader);
-
-				if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-					return shader;
-				} else {
-					console.log(gl.getShaderInfoLog(shader));
-					gl.deleteShader(shader);
-				}
-			}
-
-			createProgram(vertex, fragment) {
-				const gl = this.gl;
-
-				const vertexShader = this.createShader(gl.VERTEX_SHADER, vertex);
-				const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, fragment);
-
-				const program = gl.createProgram();
-
-				gl.attachShader(program, vertexShader);
-				gl.attachShader(program, fragmentShader);
-				gl.linkProgram(program);
-
-				if (gl.getProgramParameter(program, gl.LINK_STATUS)) {
-					gl.useProgram(program);
-					this.program = program;
-				} else {
-					console.log(gl.getProgramInfoLog(program));
-					gl.deleteProgram(program);
-				}
-			}
-
-			createUniforms(data) {
-				const gl = this.gl;
-				const uniforms = (this.data.uniforms = data);
-				const values = (this.uniforms = {});
-
-				Object.keys(uniforms).forEach(name => {
-					const uniform = uniforms[name];
-
-					uniform.location = gl.getUniformLocation(this.program, 'u_' + name);
-
-					Object.defineProperty(values, name, {
-						set: value => {
-							uniforms[name].value = value;
-							this.setUniform(name, value);
-						},
-						get: () => uniforms[name].value
-					});
-				});
-			}
-
-			setUniform(name, value) {
-				const gl = this.gl;
-				const uniform = this.data.uniforms[name];
-
-				uniform.value = value;
-
-				switch (uniform.type) {
-					case 'int': {
-						gl.uniform1i(uniform.location, value);
-						break;
-					}
-					case 'float': {
-						gl.uniform1f(uniform.location, value);
-						break;
-					}
-					case 'vec2': {
-						gl.uniform2f(uniform.location, ...value);
-						break;
-					}
-					case 'vec3': {
-						gl.uniform3f(uniform.location, ...value);
-						break;
-					}
-					case 'vec4': {
-						gl.uniform4f(uniform.location, ...value);
-						break;
-					}
-					case 'mat2': {
-						gl.uniformMatrix2fv(uniform.location, false, value);
-						break;
-					}
-					case 'mat3': {
-						gl.uniformMatrix3fv(uniform.location, false, value);
-						break;
-					}
-					case 'mat4': {
-						gl.uniformMatrix4fv(uniform.location, false, value);
-						break;
-					}
-				}
-
-				// ivec2       : uniform2i,
-				// ivec3       : uniform3i,
-				// ivec4       : uniform4i,
-				// sampler2D   : uniform1i,
-				// samplerCube : uniform1i,
-				// bool        : uniform1i,
-				// bvec2       : uniform2i,
-				// bvec3       : uniform3i,
-				// bvec4       : uniform4i,
-			}
-
-			updateUniforms() {
-				const gl = this.gl;
-				const uniforms = this.data.uniforms;
-
-				Object.keys(uniforms).forEach(name => {
-					const uniform = uniforms[name];
-
-					this.uniforms[name] = uniform.value;
-				});
-			}
-
-			createBuffers(data) {
-				const gl = this.gl;
-				const buffers = (this.data.buffers = data);
-				const values = (this.buffers = {});
-
-				Object.keys(buffers).forEach(name => {
-					const buffer = buffers[name];
-
-					buffer.buffer = this.createBuffer('a_' + name, buffer.size);
-
-					Object.defineProperty(values, name, {
-						set: data => {
-							buffers[name].data = data;
-							this.setBuffer(name, data);
-
-							if (name == 'position') this.count = buffers.position.data.length / 3;
-						},
-						get: () => buffers[name].data
-					});
-				});
-			}
-
-			createBuffer(name, size) {
-				const gl = this.gl;
-				const program = this.program;
-
-				const index = gl.getAttribLocation(program, name);
-				const buffer = gl.createBuffer();
-
-				gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-				gl.enableVertexAttribArray(index);
-				gl.vertexAttribPointer(index, size, gl.FLOAT, false, 0, 0);
-
-				return buffer;
-			}
-
-			setBuffer(name, data) {
-				const gl = this.gl;
-				const buffers = this.data.buffers;
-
-				if (name == null && !gl.bindBuffer(gl.ARRAY_BUFFER, null)) return;
-
-				gl.bindBuffer(gl.ARRAY_BUFFER, buffers[name].buffer);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-			}
-
-			updateBuffers() {
-				const gl = this.gl;
-				const buffers = this.buffers;
-
-				Object.keys(buffers).forEach(name => (buffers[name] = buffer.data));
-
-				this.setBuffer(null);
-			}
-
-			createTexture(src) {
-				const gl = this.gl;
-				const texture = gl.createTexture();
-
-				gl.bindTexture(gl.TEXTURE_2D, texture);
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-
-				this.texture = texture;
-
-				if (src) {
-					this.uniforms.hasTexture = 1;
-					this.loadTexture(src);
-				}
-			}
-
-			loadTexture(src) {
-				const gl = this.gl;
-				const texture = this.texture;
-
-				const textureImage = new Image();
-
-				textureImage.onload = () => {
-					gl.bindTexture(gl.TEXTURE_2D, texture);
-
-					gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
-
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-					// gl.generateMipmap( gl.TEXTURE_2D )
-				};
-
-				textureImage.src = src;
-			}
-
-			update() {
-				const gl = this.gl;
-
-				const now = performance.now();
-				const elapsed = (now - this.time.start) / 5000;
-				const delta = now - this.time.old;
-				this.time.old = now;
-
-				this.uniforms.time = elapsed;
-
-				if (this.count > 0) {
-					gl.clear(gl.COLOR_BUFFER_BIT);
-					gl.drawArrays(gl.POINTS, 0, this.count);
-				}
-
-				this.onUpdate(delta);
-
-				requestAnimationFrame(this.update);
-			}
-		}
-
-		const pointSize = 3;
-
-		const waves = new ShaderProgram(document.querySelector('#waves'), {
-			texture:
-				'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAb1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8v0wLRAAAAJHRSTlMAC/goGvDhmwcExrVjWzrm29TRqqSKenRXVklANSIUE8mRkGpv+HOfAAABCElEQVQ4y4VT13LDMAwLrUHteO+R9f/fWMfO6dLaPeKVEECRxOULWsEGpS9nULDwia2Y+ALqUNbAWeg775zv+sA4/FFRMxt8U2FZFCVWjR/YrH4/H9sarclSKdPMWKzb8VsEeHB3m0shkhVCyNzeXeAQ9Xl4opEieX2QCGnwGbj6GMyjw9t1K0fK9YZunPXeAGsfJtYjwzxaBnozGGorYz0ypK2HzQSYx1y8DgSRo2ewOiyh2QWOEk1Y9OrQV0a8TiBM1a8eMHWYnRMy7CZ4t1CmyRkhSUvP3gRXyHOCLBxNoC3IJv//ZrJ/kxxUHPUB+6jJZZHrpg6GOjnqaOmzp4NDR48OLxn/H27SRQ08S0ZJAAAAAElFTkSuQmCC',
-			uniforms: {
-				size: { type: 'float', value: pointSize },
-				field: { type: 'vec3', value: [0, 0, 0] },
-				speed: { type: 'float', value: 5 }
-			},
-			vertex: `
-			    #define M_PI 3.1415926535897932384626433832795
-			
-			    precision highp float;
-			
-			    attribute vec4 a_position;
-			    attribute vec4 a_color;
-			
-			    uniform float u_time;
-			    uniform float u_size;
-			    uniform float u_speed;
-			    uniform vec3 u_field;
-			    uniform mat4 u_projection;
-			
-			    varying vec4 v_color;
-			
-			    void main() {
-			
-			      vec3 pos = a_position.xyz;
-			
-			      pos.y += (
-			        cos(pos.x / u_field.x * M_PI * 8.0 + u_time * u_speed) +
-			        sin(pos.z / u_field.z * M_PI * 8.0 + u_time * u_speed)
-			      ) * u_field.y;
-			
-			      gl_Position = u_projection * vec4( pos.xyz, a_position.w );
-			      gl_PointSize = ( u_size / gl_Position.w ) * 100.0;
-			
-			      v_color = a_color;
-			
-			    }`,
-			fragment: `
-			    precision highp float;
-			
-			    uniform sampler2D u_texture;
-			
-			    varying vec4 v_color;
-			
-			    void main() {
-			
-			      gl_FragColor = v_color * texture2D(u_texture, gl_PointCoord);
-			
-			    }`,
-			onResize(w, h, dpi) {
-				const position = [],
-					color = [];
-
-				const width = 400 * (w / h);
-				const depth = 400;
-				const height = 3;
-				const distance = 5;
-
-				for (let x = 0; x < width; x += distance) {
-					for (let z = 0; z < depth; z += distance) {
-						position.push(-width / 2 + x, -30, -depth / 2 + z);
-						color.push(0, 1 - (x / width) * 1, 0.5 + (x / width) * 0.5, z / depth);
-					}
-				}
-
-				this.uniforms.field = [width, height, depth];
-
-				this.buffers.position = position;
-				this.buffers.color = color;
-
-				this.uniforms.size = (h / 400) * pointSize * dpi;
-			}
-		});
-	}
+<script setup>
+import Zdog from "zdog";
+import { ref, onUnmounted, onMounted } from "vue";
+const cav = ref(null);
+let timer = null;
+onMounted(() => {
+    draw3dAstronaut();
+});
+/**
+ * @description: 画3d太空人
+ * @param {*}
+ * @return {*}
+ */
+const draw3dAstronaut = () => {
+    cav.value.width = cav.value.parentNode.clientWidth;
+    cav.value.height = cav.value.parentNode.clientHeight;
+
+    // colours
+    let dark_navy = "#131e38";
+    let orange = "#fe9642";
+    let cream = "#FFF8E7";
+    let light_purple = "#7f3f98";
+    let dark_purple = "#563795";
+    let cheese = "#fbc715";
+
+    // create illo
+    let illo = new Zdog.Illustration({
+        // set canvas with selector
+        element: cav.value,
+        dragRotate: true,
+        zoom: 0.65,
+    });
+
+    /** Body **/
+    // Body
+    let body = new Zdog.RoundedRect({
+        addTo: illo,
+        width: 200,
+        height: 220,
+        color: "white",
+        fill: true,
+        cornerRadius: 16,
+        stroke: 60,
+    });
+
+    // Backpack
+    new Zdog.RoundedRect({
+        addTo: body,
+        width: 180,
+        height: 310,
+        color: orange,
+        fill: true,
+        cornerRadius: 24,
+        stroke: 120,
+        translate: { z: -85, y: -60 },
+    });
+
+    /** arm **/
+    let arm = new Zdog.RoundedRect({
+        addTo: body,
+        height: 30,
+        width: 28,
+        stroke: 60,
+        fill: true,
+        color: dark_purple,
+        translate: { x: -140, y: -64 },
+        cornerRadius: 0.05,
+    });
+
+    new Zdog.RoundedRect({
+        addTo: arm,
+        height: 120,
+        width: 12,
+        stroke: 60,
+        fill: true,
+        color: cream,
+        translate: { y: 120 },
+        cornerRadius: 0.05,
+    });
+
+    // bubble_arm
+    let bubble_arm = new Zdog.Shape({
+        addTo: arm,
+        path: [{ x: -20 }, { x: 20 }],
+        stroke: 32,
+        color: light_purple,
+        translate: { y: 210 },
+    });
+
+    bubble_arm.copy({
+        color: dark_purple,
+        translate: { y: 230 },
+    });
+
+    // hand
+    new Zdog.RoundedRect({
+        addTo: bubble_arm,
+        height: 32,
+        width: 22,
+        translate: { x: -8, y: 60 },
+        fill: true,
+        color: cheese,
+        stroke: 30,
+    });
+
+    new Zdog.RoundedRect({
+        addTo: bubble_arm,
+        height: 24,
+        width: 0,
+        translate: { x: 24, y: 50 },
+        fill: true,
+        color: orange,
+        stroke: 20,
+    });
+
+    arm.copyGraph({
+        translate: { x: 140, y: -64 },
+        rotate: { y: Zdog.TAU / 2 },
+    });
+
+    /** Leg **/
+    let leg = new Zdog.RoundedRect({
+        addTo: body,
+        height: 160,
+        width: 28,
+        stroke: 60,
+        fill: true,
+        color: cream,
+        translate: { x: -56, y: 230 },
+        cornerRadius: 0.05,
+    });
+
+    // bubble_leg
+    let bubble_leg = new Zdog.Shape({
+        addTo: leg,
+        path: [{ x: -28 }, { x: 28 }],
+        stroke: 32,
+        color: light_purple,
+        translate: { y: 100 },
+    });
+
+    bubble_leg.copy({
+        color: dark_purple,
+        translate: { y: 124 },
+    });
+
+    // foot
+    new Zdog.RoundedRect({
+        addTo: leg,
+        width: 96,
+        height: 24,
+        stroke: 40,
+        fill: true,
+        color: cheese,
+        translate: { x: -24, y: 170 },
+        cornerRadius: 24,
+    });
+
+    leg.copyGraph({
+        translate: { x: 56, y: 230 },
+        rotate: { y: Zdog.TAU / 2 },
+    });
+
+    /** Head **/
+    // Head
+    let head = new Zdog.RoundedRect({
+        addTo: body,
+        width: 216,
+        height: 180,
+        depth: 40,
+        cornerRadius: 80,
+        stroke: 60,
+        color: cream,
+        fill: true,
+        translate: { y: -300 },
+    });
+
+    //add helmet
+    let helmet = new Zdog.RoundedRect({
+        addTo: head,
+        width: 210,
+        height: 165,
+        cornerRadius: 64,
+        color: dark_navy,
+        fill: true,
+        backface: false,
+        translate: { z: 20 },
+    });
+
+    //add refletion
+    new Zdog.Rect({
+        addTo: helmet,
+        width: 48,
+        height: 2,
+        stroke: 10,
+        translate: { x: 24, y: -24, z: 10 },
+        color: "white",
+        backface: false,
+    });
+
+    // add ear
+    let ear = new Zdog.RoundedRect({
+        addTo: head,
+        width: 36,
+        height: 72,
+        cornerRadius: 80,
+        stroke: 20,
+        color: orange,
+        fill: true,
+        translate: { x: -140 },
+    });
+
+    ear.copy({
+        translate: { x: 140 },
+    });
+
+    // neck
+    let neck = new Zdog.Shape({
+        addTo: head,
+        path: [{ x: -110 }, { x: 110 }],
+        translate: { y: 120 },
+        stroke: 40,
+        color: light_purple,
+    });
+
+    neck.copy({
+        translate: { y: 160 },
+        color: dark_purple,
+    });
+
+    /** extra **/
+    let stripe_1 = new Zdog.Shape({
+        addTo: body,
+        path: [{ x: -20 }, { x: 20 }],
+        stroke: 10,
+        translate: { x: 200, z: 200 },
+        color: cheese,
+    });
+
+    stripe_1.copy({
+        translate: { x: 320, y: 200, z: -400 },
+        color: cheese,
+    });
+
+    stripe_1.copy({
+        translate: { x: -220, y: 300, z: -400 },
+        color: "white",
+    });
+
+    stripe_1.copy({
+        translate: { x: -100, y: 400, z: -280 },
+        color: light_purple,
+    });
+
+    stripe_1.copy({
+        translate: { x: 50, y: -60, z: 150 },
+        color: orange,
+    });
+
+    stripe_1.copy({
+        translate: { x: -250, y: 80, z: 300 },
+        color: light_purple,
+    });
+
+    stripe_1.copy({
+        translate: { x: -350, y: -280, z: 175 },
+        color: dark_purple,
+    });
+
+    stripe_1.copy({
+        translate: { x: 250, y: -380, z: -175 },
+        color: "white",
+    });
+
+    // update & render
+    illo.updateRenderGraph();
+
+    function animate() {
+        // rotate illo each frame
+        illo.rotate.y += 0.005;
+        illo.rotate.x += 0.005;
+        illo.rotate.z += 0.005;
+        illo.updateRenderGraph();
+        // animate next frame
+        timer = requestAnimationFrame(animate);
+    }
+
+    // start animation
+    animate();
 };
+onUnmounted(() => {
+    cancelAnimationFrame(timer);
+    timer = null;
+});
 </script>
 
-<style scoped>
-canvas {
-	display: block;
+<style  scoped>
+.ve_404 {
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, #2f3640 23%, #181b20 100%);
 }
-.waves {
-	background: #000 !important;
-	position: absolute;
-	left: 0;
-	top: 0;
-	right: 0;
-	bottom: 0;
+.moon {
+    background: linear-gradient(90deg, #d0d0d0 48%, #919191 100%);
+    position: absolute;
+    top: -30vh;
+    left: -80vh;
+    width: 154vh;
+    height: 160%;
+    content: "";
+    border-radius: 50%;
+    box-shadow: 0px 0px 30px -4px rgba(0, 0, 0, 0.5);
 }
-.box{
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	left: 0;
-	top: 0;
 
+.moon__crater {
+    position: absolute;
+    content: "";
+    border-radius: 100%;
+    background: linear-gradient(90deg, #7a7a7a 38%, #c3c3c3 100%);
+    opacity: 0.6;
+}
+
+.moon__crater1 {
+    top: 250px;
+    left: 500px;
+    width: 60px;
+    height: 180px;
+}
+
+.moon__crater2 {
+    top: 650px;
+    left: 340px;
+    width: 40px;
+    height: 80px;
+    transform: rotate(55deg);
+}
+
+.moon__crater3 {
+    top: -20px;
+    left: 40px;
+    width: 65px;
+    height: 120px;
+    transform: rotate(250deg);
+}
+
+.star {
+    color: grey;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    content: "";
+    border-radius: 100%;
+    transform: rotate(250deg);
+    opacity: 0.4;
+    animation-name: shimmer;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes shimmer {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 0.7;
+    }
+}
+
+.star1 {
+    top: 40%;
+    left: 50%;
+    animation-delay: 1s;
+}
+
+.star2 {
+    top: 60%;
+    left: 90%;
+    animation-delay: 3s;
+}
+
+.star3 {
+    top: 10%;
+    left: 70%;
+    animation-delay: 2s;
+}
+
+.star4 {
+    top: 90%;
+    left: 40%;
+}
+
+.star5 {
+    top: 20%;
+    left: 30%;
+    animation-delay: 0.5s;
+}
+
+.astronaut {
+    position: absolute;
+    width: 35vw;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    z-index: 0;
+}
+
+.error {
+    position: absolute;
+    left: 100px;
+    top: 400px;
+    transform: translateY(-60%);
+    font-family: "Righteous", cursive;
+    color: #363e49;
+    z-index: 1;
+}
+
+.error__title {
+    font-size: 10em;
+    font-weight: bold;
+    color: #d0d0d0;
+    text-shadow: -5px -5px 0 rgba(0, 0, 0, 0.7);
+    background-image: linear-gradient(90deg, #d0d0d0 48%, #919191 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.error__subtitle {
+    font-size: 2em;
+}
+
+.error__description {
+    opacity: 0.5;
+}
+
+.error__button {
+    min-width: 7em;
+    margin-top: 3em;
+    margin-right: 0.5em;
+    padding: 0.5em 2em;
+    outline: none;
+    border: 2px solid #2f3640;
+    background-color: transparent;
+    border-radius: 8em;
+    color: #576375;
+    cursor: pointer;
+    transition-duration: 0.2s;
+    font-size: 0.75em;
+    font-family: "Righteous", cursive;
+}
+
+.error__button:hover {
+    color: #21252c;
+}
+
+.error__button--active {
+    background-color: $base-color;
+    border: 2px solid $base-color;
+    color: white;
+}
+
+.error__button--active:hover {
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.5);
+    color: white;
 }
 </style>
