@@ -129,24 +129,30 @@
 
                   <el-dropdown trigger="click" @click.stop>
                     <el-tooltip
+                      v-if="Object.keys(data.stepInfo.host).length !== 0"
                       class="box-item"
                       effect="dark"
-                      content="这是一个tooltip"
+                      :content="data.stepInfo.host.host"
                       placement="top"
                     >
-                      <el-button style="margin-top:-13px;margin-bottom: -2px" type="text" size="max" @click.stop>全局环境</el-button>
+                      <el-button  style="margin-top:-13px;margin-bottom: -2px" type="text" size="max" @click.stop>{{data.stepInfo.host.name}}</el-button>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-else
+                      class="box-item"
+                      effect="dark"
+                      content="默认环境host"
+                      placement="top"
+                    >
+                      <el-button style="margin-top:-13px;margin-bottom: -2px" type="text" size="max" @click.stop>默认环境</el-button>
                     </el-tooltip>
                     <template #dropdown>
                       <el-dropdown-menu>
-                          <el-dropdown-item v-for="item in testEnvs" :key="item.id" command='api' @click="envClick()">
+                          <el-dropdown-item v-for="item in testEnvsWithDefault" :key="item.id" command='api' @click="envClick(item,data.stepInfo)">
                             {{item.name}}
                           </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
-
-
-
-
                   </el-dropdown>
                     <b class="card-url">{{ data.stepInfo.url  }}</b>
                     <span class="card-name">{{data.stepInfo.name }}</span>
@@ -426,12 +432,17 @@ export default {
         ],
       test:'',
       treeKey: '',
-      isExpand: false
+      isExpand: false,
       }
     },
 
   computed: {
 		...mapState(['pro','case','envId','testEnvs']),
+    testEnvsWithDefault() {
+      const withDefault = [...this.testEnvs];
+      withDefault.unshift({ host:'默认环境host', name: '默认环境' });
+      return withDefault;
+    },
     username() {
 			return window.sessionStorage.getItem('username');
 		},
@@ -850,9 +861,23 @@ async copyTree(data, parentId = null, isLastCall = true) {
 	      this.treeKey = +new Date()
 	      this.isExpand = isExpand
 	    },
-  envClick(){
-    console.log(this.testEnvs)
-  },
+  async envClick(item,data){
+      let params;
+      if(item.name==='默认环境'){
+        params = {host:{}}
+      }else {
+        params = {host:{host:item.host,name:item.name}}
+      }
+      const response = await this.$api.updatenewInterface( data.id, params);
+      if (response.status === 200) {
+          ElMessage({
+            type: 'success',
+            message: '变更成功',
+            duration: 1000
+          });
+          }
+      this.getCaseStep(this.case.id)
+    },
 
   },
   created() {
