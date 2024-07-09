@@ -1,21 +1,15 @@
 # Hrun测试平台
-
-## backend
-
-#### 介绍
-学习交流分享
+## 平台地址
+```
+项目体验地址：http://139.9.38.166:5002/
+gitee地址：https://gitee.com/hsjtest/hrun
+```
+## 🔷backend
 
 #### 软件架构
 软件架构说明
 ```
-    Mysql
-    Django
-    Python
-    Nginx
-    Redis
-    Celery
-    Docker
-    Jenkins
+基于 python3 + Django + celery + mariadb + redis
 ```
 
 #### 安装教程
@@ -49,13 +43,15 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
-#### 项目目录结构
-
-#### 参与贡献
 
 
-## frontend
+## 🔷frontend
 
+## 软件架构
+软件架构说明
+```
+基于 js + vue3 + element-plus + echarts
+```
 ## 安装node.js
 ```
 官网地址：https://nodejs.org/en
@@ -89,5 +85,18 @@ src：
     store -- 数据共享等配置
     views -- 各个页面的vue代码存放
 ```
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 瞅一眼吧
+![img.png](img.png)
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+![img_4.png](img_4.png)
+![img_5.png](img_5.png)
+![img_6.png](img_6.png)
+
+## 规划
+目前平台还在持续开发中，后续会持续更新，敬请期待！
+
+## 感谢
+1、如果觉得好用，请给个star，谢谢！
+2、有什么问题，欢迎提issue，联系微信：W1565560575
