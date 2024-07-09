@@ -1,7 +1,7 @@
 <template>
 	<LoginBack>
 		<div class="login_box">
-			<div class="logo_box" ><img src="../assets/images/login1.png" /></div>
+			<div class="logo_box" ><img src="../assets/images/logo.png" /></div>
         <el-tabs v-model="activeName" class="demo-tabs">
           <el-tab-pane label="登 录" name="first">
             <el-form ref="loginRef" class="login_from" :model="loginForm" :rules="rulesLogin">
@@ -207,6 +207,7 @@ export default {
 
 	/* logo居中 */
 	.logo_box {
+    margin-top: 70px;
 		text-align: center;
     height: 130px;
 	}
