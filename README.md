@@ -6,14 +6,14 @@ gitee地址：https://gitee.com/hsjtest/hrun
 ```
 ## 🔷backend
 
-##### 软件架构
+#### 软件架构
 ###### 软件架构说明
 ```
 基于 python3 + Django + celery + mariadb + redis
 ```
 
-##### 安装教程
-手动部署
+#### 安装教程
+###### 手动部署
 ```
 1、创建虚拟环境执行依赖包：pip install -r requirements.txt
 2、backend/primaryApp/settings/dev.py或pro.py修改自己的数据库和Redis配置信息
@@ -21,25 +21,25 @@ gitee地址：https://gitee.com/hsjtest/hrun
 4、数据库执行迁移文件：python manage.py migrate
 5、运行Django服务：python manage.py runserver
 ```
-自动部署
+###### 自动部署
 ```
 1、服务器中安装docker和docker-compose
 2、运行 sh deploy.sh
 ```
-##### 使用说明
-static配置文件生成
+#### 使用说明
+###### static配置文件生成
 ```
 python manage.py collectstatic
 ```
-数据库迁移
+###### 数据库迁移
 ```
 python manage.py makemigrations
 ```
-数据库执行迁移文件
+###### 数据库执行迁移文件
 ```
 python manage.py migrate
 ```
-运行Django服务
+###### 运行Django服务
 ```
 python manage.py runserver
 ```
@@ -48,7 +48,7 @@ python manage.py runserver
 ## 🔷frontend
 
 #### 软件架构
-######软件架构说明
+###### 软件架构说明
 ```
 基于 js + vue3 + element-plus + echarts
 ```
@@ -71,7 +71,7 @@ npm run serve
 ```
 npm run build
 ```
-##### 目录结构
+#### 目录结构
 ```
 dist -- 存放生产部署打包配置
 node_modules -- 项目所需的各种依赖包和模块
@@ -86,13 +86,13 @@ src：
     views -- 各个页面的vue代码存放
 ```
 ## 瞅一眼吧
-![img.png](img.png)
-![img_1.png](img_1.png)
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
-![img_4.png](img_4.png)
-![img_5.png](img_5.png)
-![img_6.png](img_6.png)
+![img.png](git_img/img.png)
+![img_1.png](git_img/img_1.png)
+![img_2.png](git_img/img_2.png)
+![img_3.png](git_img/img_3.png)
+![img_4.png](git_img/img_4.png)
+![img_5.png](git_img/img_5.png)
+![img_6.png](git_img/img_6.png)
 
 ## 规划
 目前平台还在持续开发中，后续会持续更新，敬请期待！
@@ -101,5 +101,5 @@ src：
 ```
 如果觉得好用，请给个star，谢谢！
 ```
-2、有什么问题，欢迎提issue，联系微信
-![img_7.png](img_7.png)
+有什么问题，欢迎提issue，联系微信
+![img_7.png](git_img/img_7.png)
