@@ -1,15 +1,18 @@
 <template>
 	  <el-tabs model-value="rb" style="min-height: 300px;" type="border-card" value="rb" size="mini">
 		<el-tab-pane v-if="result.type == 'api'" label="响应体" name="rb">
-			  <div v-if="result.response_header">
-				<div v-if="result.response_header['Content-Type'].search('application/json') != -1">
-					<Editor :readOnly="true" v-model="result.response_body" lang="json" theme="chrome"></Editor>
-				</div>
-				<div v-else>
-          <Editor :readOnly="true" v-model="result.response_body" lang="html" theme="chrome" height="500px"></Editor>
+      <div v-if="result.response_header">
+        <div v-if="result.response_header['Content-Type'].includes('application/json')">
+          <!-- 如果 Content-Type 是 application/json，渲染 JSON 格式的 Editor -->
+          <Editor :readOnly="true" v-model="result.response_body" lang="json" theme="chrome"></Editor>
         </div>
-			</div>
-		</el-tab-pane>
+        <div v-else>
+          <el-scrollbar height="400px"  @wheel.stop>
+            <Editor :readOnly="true" v-html="result.response_body" lang="html" theme="chrome" height="400px"></Editor>
+          </el-scrollbar>
+        </div>
+      </div>
+    </el-tab-pane>
 		<el-tab-pane v-if="result.type == 'api'" label="响应头" name="rh">
       <el-scrollbar height="400px" @wheel.stop>
 			  <div class="tab-box-sli" v-if="result.response_header">
@@ -38,7 +41,7 @@
 							<b>Request Headers</b>
 						</template>
 						<div v-for="(value, key) in result.requests_header">
-							<span>{{ key + ' : ' + value }} :</span>
+							<span>{{ key + ' : ' + value }}</span>
 						</div>
 					</el-collapse-item>
 					<el-collapse-item name="3">
@@ -83,26 +86,26 @@
 			</template>
 		</el-tab-pane>
 	</el-tabs>
-	<div style="margin-top: 10px;width: 100%;text-align: center;" v-if="result.state === '失败' && showbtn">
-		<el-button  @click="getInterfaces" type="success" plain size="mini">提交bug</el-button>
-	</div>
-	<!-- 添加bug的弹框 -->
-	<el-dialog title="提交bug" v-model="addBugDlg" width="40%" :before-close="closeDialogResult">
-		<el-form :model="bugForm">
-			<el-form-item label="所属接口">
-				<el-select size="small" v-model="bugForm.interface" placeholder="bug对应的接口" style="width: 100%;">
-					<el-option :label="iter.name + ' ' + iter.url" :value="iter.id" v-for="iter in interfaces" :key="iter.id"></el-option>
-				</el-select>
-			</el-form-item>
-			<el-form-item label="bug描述"><el-input :autosize="{ minRows: 3, maxRows: 4 }" v-model="bugForm.desc" type="textarea" autocomplete="off"></el-input></el-form-item>
-		</el-form>
-		<template #footer>
-			<div class="dialog-footer">
-				<el-button @click="closeDialogResult">取 消</el-button>
-				<el-button type="success" @click="saveBug">确 定</el-button>
-			</div>
-		</template>
-	</el-dialog>
+    <div style="margin-top: 10px;width: 100%;text-align: center;" v-if="result.state === '失败' && showbtn">
+      <el-button  @click="getInterfaces" type="success" plain size="mini">提交bug</el-button>
+    </div>
+    <!-- 添加bug的弹框 -->
+    <el-dialog title="提交bug" v-model="addBugDlg" width="40%" :before-close="closeDialogResult">
+      <el-form :model="bugForm">
+        <el-form-item label="所属接口">
+          <el-select size="small" v-model="bugForm.interface" placeholder="bug对应的接口" style="width: 100%;">
+            <el-option :label="iter.name + ' ' + iter.url" :value="iter.id" v-for="iter in interfaces" :key="iter.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="bug描述"><el-input :autosize="{ minRows: 3, maxRows: 4 }" v-model="bugForm.desc" type="textarea" autocomplete="off"></el-input></el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="closeDialogResult">取 消</el-button>
+          <el-button type="success" @click="saveBug">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
 </template>
 
 <script>

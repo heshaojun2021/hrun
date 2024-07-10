@@ -245,8 +245,10 @@ class BaseTest(unittest.TestCase, CaseRunLog):
             data['request']['data'] = form_data
             data['files'] = None
         else:
-            if data['headers'].get("Content-Type"):
-                del data['headers']["Content-Type"]
+            pass
+        #     if data['headers'].get("Content-Type"):
+        #         del data['headers']["Content-Type"]
+
         # 组织requests 发送请求所需要的参数格式
         request_params = {}
         # requests请求所需的所有字段
@@ -260,12 +262,54 @@ class BaseTest(unittest.TestCase, CaseRunLog):
         if url.startswith("http://") or url.startswith("https://"):
             request_params['url'] = url
         else:
-            request_params['url'] = ENV.get('host') + url
+            if data.get('interface').get('host') != {}:
+                try:
+                    request_params['url'] = data.get('interface').get('host',{}).get('host') + url
+                except TypeError:
+                    request_params['url'] = ENV.get('host') + url
+            else:
+                request_params['url'] = ENV.get('host') + url
         # 请求方法
         request_params['method'] = data.get('interface').get('method')
         # 请求头
         request_params['headers'] = data['headers']
         return request_params
+
+    def __run_script(test, data):
+        print = test.print
+        env = test.env
+        setup_script = data.get('setup_script')
+        if setup_script:
+            try:
+                exec(setup_script)
+            except Exception as e:
+                test.error_log('前置脚本执行错误:\n{}'.format(e))
+                delattr(test, '_hook_gen')
+                raise
+        response = yield
+        teardown_script = data.get('teardown_script')
+        if teardown_script:
+            try:
+                exec(teardown_script)
+            except AssertionError as e:
+                test.warning_log('断言失败:\n{}'.format(e))
+                raise e
+            except Exception as e:
+                test.error_log('后置脚本执行错误:\n{}'.format(e))
+                raise
+        yield
+
+    def __run_teardown_script(self, response):
+        """执行后置脚本"""
+        self.info_log('执行后置脚本')
+        self._hook_gen.send(response)
+        delattr(self, '_hook_gen')
+
+    def __run_setup_script(self, data):
+        """执行前置脚本"""
+        self.info_log('执行前置脚本')
+        self._hook_gen = self.__run_script(data)
+        next(self._hook_gen)
 
     # ------------------------------- script步骤处理逻辑 ---------------------------------------
     def script_perform(self, data):
@@ -672,42 +716,6 @@ class BaseTest(unittest.TestCase, CaseRunLog):
             self.info_log('↩ 【断言通过】')
         else:
             raise TypeError('断言比较   方法{},不支持!'.format(methods))
-
-    def __run_script(test, data):
-        print = test.print
-        env = test.env
-        setup_script = data.get('setup_script')
-        if setup_script:
-            try:
-                exec(setup_script)
-            except Exception as e:
-                test.error_log('前置脚本执行错误:\n{}'.format(e))
-                delattr(test, '_hook_gen')
-                raise
-        response = yield
-        teardown_script = data.get('teardown_script')
-        if teardown_script:
-            try:
-                exec(teardown_script)
-            except AssertionError as e:
-                test.warning_log('断言失败:\n{}'.format(e))
-                raise e
-            except Exception as e:
-                test.error_log('后置脚本执行错误:\n{}'.format(e))
-                raise
-        yield
-
-    def __run_teardown_script(self, response):
-        """执行后置脚本"""
-        self.info_log('执行后置脚本')
-        self._hook_gen.send(response)
-        delattr(self, '_hook_gen')
-
-    def __run_setup_script(self, data):
-        """执行前置脚本"""
-        self.info_log('执行前置脚本')
-        self._hook_gen = self.__run_script(data)
-        next(self._hook_gen)
 
 
 def run(case_data, env_config, thread_count=1, debug=True):

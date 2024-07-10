@@ -167,7 +167,8 @@ class TestCaseRunSerializer(serializers.ModelSerializer):
         return {
             'url': obj.url,
             'name': obj.name,
-            'method': obj.method
+            'method': obj.method,
+            'host': obj.host
         }
 
 class TestCaseRunControllerSerializer(serializers.ModelSerializer):
