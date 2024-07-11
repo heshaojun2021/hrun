@@ -1,8 +1,9 @@
 # HRUN测试平台
 ## 平台地址
 ```
-项目体验地址：http://139.9.38.166:5002/
-gitee地址：https://gitee.com/hsjtest/hrun
+项目体验地址：<a href="http://139.9.38.166:5002/" target="_blank">http://139.9.38.166:5002/</a>
+gitee地址：<a href="https://gitee.com/hsjtest/hrun" target="_blank">https://gitee.com/hsjtest/hrun</a>
+
 ```
 ## 🔷backend
 
