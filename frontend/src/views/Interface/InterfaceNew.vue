@@ -162,9 +162,18 @@
                       @click="clickLog"
                       style="font-weight: bold"
                     >
+                      接口MOCK
+                    </el-button >
+                    <el-button
+                      type="text"
+                      size="small"
+                      class="card-button"
+                      @click="clickLog"
+                      style="font-weight: bold"
+                    >
                       操作记录
                     </el-button >
-                         <el-dropdown style="margin-left: 10px" trigger="click">
+                         <el-dropdown style="margin-left: 10px; margin-right: -10px" trigger="click">
                           <el-button  type="text" size="small" :style="{ color: buttonColor(scope.row.status) }">
                             <i v-if="scope.row.status!='状态'" class="el-icon-s-flag" style="margin-right: -1px;" :style="{ color: buttonColor(scope.row.status) }"></i>
                             {{ scope.row.status}}
@@ -538,9 +547,18 @@ data() {
   margin-left: 10px;
   margin-right: 10px;
   font-size: 15px;
+  white-space: nowrap; /* 不换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 超出部分显示省略号 */
+  width: 300px; /* 根据需要限制宽度 */
+  text-align: left;
 }
 .card-name {
   font-size: 14px;
+  white-space: nowrap; /* 不换行 */
+  overflow: hidden; /* 隐藏超出部分 */
+  text-overflow: ellipsis; /* 超出部分显示省略号 */
+  width: 200px; /* 根据需要限制宽度 */
 }
 .el-tag {
   color: #ffffff;
