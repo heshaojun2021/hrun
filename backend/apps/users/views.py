@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 import json
 
 from rest_framework import status

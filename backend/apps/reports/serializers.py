@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 from rest_framework.serializers import ModelSerializer, StringRelatedField,DateTimeField
 
 from .models import Record, Report

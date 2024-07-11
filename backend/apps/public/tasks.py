@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 import requests
 
 from common.YApiData import DataWorkers

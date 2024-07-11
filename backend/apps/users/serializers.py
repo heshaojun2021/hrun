@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 from django.contrib.auth.hashers import make_password
 from requests import Response
 from rest_framework import serializers, status

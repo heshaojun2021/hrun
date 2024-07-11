@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 # from channels.generic.websocket import AsyncWebsocketConsumer
 #
 # class MyConsumer(AsyncWebsocketConsumer):

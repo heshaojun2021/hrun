@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 # 项目的公共配置
 """
 Django settings for primaryApp project.

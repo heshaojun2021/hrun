@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "primaryApp.settings.dev")
 import django

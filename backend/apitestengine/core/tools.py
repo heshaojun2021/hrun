@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
 
 import base64
 import time

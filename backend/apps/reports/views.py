@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 from datetime import timedelta
 
 from django.utils import timezone

@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
 import pymysql
-
 
 class DBMysql:
     """mysql databases"""

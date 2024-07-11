@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 # 开发配置模块
 # 导入公共配置
 from .base_settings import *

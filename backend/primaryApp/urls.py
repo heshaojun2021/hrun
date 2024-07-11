@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 """primaryApp URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:

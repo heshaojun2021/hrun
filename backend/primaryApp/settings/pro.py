@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 # 生产配置模块
 # 导入公共配
 from .base_settings import *

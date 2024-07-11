@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 from celery import shared_task
 
 from apitestengine.core.cases import run

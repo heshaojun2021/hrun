@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
+
 from django.apps import AppConfig
 
 

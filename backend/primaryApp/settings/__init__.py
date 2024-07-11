@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 import os
 # 通过环境变量 ENV判断当前是生产环境还是开发环境
 

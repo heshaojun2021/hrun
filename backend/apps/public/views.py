@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 from django.core.cache import cache
 
 from rest_framework import status

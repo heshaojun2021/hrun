@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# @author: HRUN
+
 from django.db.models import ProtectedError
 from rest_framework import status
 
