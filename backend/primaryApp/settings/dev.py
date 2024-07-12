@@ -15,13 +15,13 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'my_db',
+        'NAME': 'dev_db',
         'USER': 'root',
         'PASSWORD': 'pythonvip',
         'PORT': '3307',
         # 'HOST': '172.21.0.3'  # 如果写成了ip，这个ip并不是固定，最好写成容器的名字
                               # docker的网桥维护了一个host，使用容器的名字映射容器的ip
-        'HOST': '139.9.38.166'
+        'HOST': '120.24.254.107'
     }
 }
 
@@ -36,7 +36,7 @@ CORS_ALLOW_CREDENTIALS = True
 # celery配置
 # 时区
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_BROKER_URL = 'redis://@139.9.38.166:9000/0'
+CELERY_BROKER_URL = 'redis://@120.24.254.107:9000/0'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # CELERY_BROKER_URL = 'redis://:pythonvip@192.168.66.101:2000/2'
 # 禁止celery自己的日志器
@@ -47,7 +47,7 @@ CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://139.9.38.166:9000/0',
+        'LOCATION': 'redis://120.24.254.107:9000/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }

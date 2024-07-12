@@ -550,7 +550,7 @@ data() {
   white-space: nowrap; /* 不换行 */
   overflow: hidden; /* 隐藏超出部分 */
   text-overflow: ellipsis; /* 超出部分显示省略号 */
-  width: 300px; /* 根据需要限制宽度 */
+  width: 400px; /* 根据需要限制宽度 */
   text-align: left;
 }
 .card-name {
@@ -558,7 +558,7 @@ data() {
   white-space: nowrap; /* 不换行 */
   overflow: hidden; /* 隐藏超出部分 */
   text-overflow: ellipsis; /* 超出部分显示省略号 */
-  width: 200px; /* 根据需要限制宽度 */
+  width: 220px; /* 根据需要限制宽度 */
 }
 .el-tag {
   color: #ffffff;
