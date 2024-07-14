@@ -133,6 +133,15 @@
                       type="text"
                       size="small"
                       class="card-button"
+                      @click="handleChildData(scope.row)"
+                      style="font-weight: bold"
+                    >
+                      接口MOCK
+                    </el-button >
+                    <el-button
+                      type="text"
+                      size="small"
+                      class="card-button"
                       @click="clickEditStep(scope.row.id)"
                       style="font-weight: bold"
                     >
@@ -155,15 +164,6 @@
                     >
                       删除
                     </el-button>
-                    <el-button
-                      type="text"
-                      size="small"
-                      class="card-button"
-                      @click="clickLog"
-                      style="font-weight: bold"
-                    >
-                      接口MOCK
-                    </el-button >
                     <el-button
                       type="text"
                       size="small"
@@ -242,6 +242,9 @@
   </el-drawer>
   <!--  导入接口窗口-->
   <interfaceImport  v-if="importDlg" :importDlg="importDlg" @close-modal="handleCloseModal"></interfaceImport>
+  <!--  mock弹窗-->
+  <el-drawer v-model="mockDlg"  :destroy-on-close="true" :with-header="false" size="60%"  @close="handleClose" ><mockInterface :interfaceData="interfaceData"  style="padding: 0 10px;"></mockInterface></el-drawer>
+
 </template>
 
 <script>
@@ -250,13 +253,15 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import newEditCase from '../../components/common/InterfaceNew/neweditCase.vue';
 import addCase from '../../components/common/InterfaceNew/addCase.vue';
 import interfaceImport from '../../views/Interface/interfaceImport.vue';
+import mockInterface from '../../views/Interface/mockInterface';
 import {mapMutations, mapState} from "vuex";
 export default {
 components: {
     treeNode,
     newEditCase,
     addCase,
-    interfaceImport
+    interfaceImport,
+    mockInterface
   },
 computed: {
     buttonText() {
@@ -323,7 +328,8 @@ data() {
           { value: '测试中', label: '测试中' },
           { value: '已发布', label: '已发布' },
           { value: '已废弃', label: '已废弃' },
-      ]
+      ],
+      mockDlg: false,
     };
   },
   methods: {
@@ -455,6 +461,7 @@ data() {
     handleClose() {
       this.addCaseDlg = false;
       this.editCaseDlg = false;
+      this.mockDlg = false;
       this.copyDlg = false;
       this.handleTreeClick(this.treeId);
     },
@@ -514,7 +521,6 @@ data() {
       default:
         return '#409eff';
     }
-
     },
   async statusClick(status,id){
     let params = {"status":status}
@@ -523,6 +529,11 @@ data() {
           this.handleTreeClick(this.treeId)
         }
     },
+
+  handleChildData(data) {
+    this.interfaceData = data
+    this.mockDlg = true;
+  },
   }
 };
 </script>
@@ -547,18 +558,9 @@ data() {
   margin-left: 10px;
   margin-right: 10px;
   font-size: 15px;
-  white-space: nowrap; /* 不换行 */
-  overflow: hidden; /* 隐藏超出部分 */
-  text-overflow: ellipsis; /* 超出部分显示省略号 */
-  width: 400px; /* 根据需要限制宽度 */
-  text-align: left;
 }
 .card-name {
   font-size: 14px;
-  white-space: nowrap; /* 不换行 */
-  overflow: hidden; /* 隐藏超出部分 */
-  text-overflow: ellipsis; /* 超出部分显示省略号 */
-  width: 220px; /* 根据需要限制宽度 */
 }
 .el-tag {
   color: #ffffff;
