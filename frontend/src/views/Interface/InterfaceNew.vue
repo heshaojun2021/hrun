@@ -136,7 +136,7 @@
                       @click="handleChildData(scope.row)"
                       style="font-weight: bold"
                     >
-                      接口MOCK
+                      接口Mock
                     </el-button >
                     <el-button
                       type="text"
