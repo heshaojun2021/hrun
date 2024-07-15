@@ -83,7 +83,7 @@
   </div>
   </el-scrollbar>
   <!--  新建期望弹窗-->
-  <el-dialog title="新建" v-model="addDlg" width="60%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
+  <el-dialog title="新建期望" v-model="addDlg" width="60%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
       <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
         <el-form-item label="期望名称" prop="name">
             <el-input v-model="detailData.name"></el-input>
