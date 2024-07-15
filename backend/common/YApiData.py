@@ -4,7 +4,7 @@
 import json
 
 class DataWorkers:
-    def main_func(self, format, data, treenode, project):
+    def main_func(self, format, data, treenode, project) -> list:
         """
         根据提供的数据格式和数据，处理并返回接口信息。
         :param format: 数据格式，可以是'list'或'json'。

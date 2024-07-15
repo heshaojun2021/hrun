@@ -9,7 +9,7 @@
           inline-prompt
           size="small"
           @click="switchClick(data)"
-          style="--el-switch-on-color: #53a8ff; --el-switch-off-color: #f56c6c; margin-left: 10px"
+          style="--el-switch-on-color: #53a8ff; margin-left: 10px"
         />
       </span>
     </div>
@@ -40,7 +40,7 @@
     </el-form>
     <div><b style="color: #101828CC; font-size: 15px">Mock 期望</b></div>
     <div style="margin-top: 15px">
-      <el-table :data="mockDetail"  stripe empty-text="暂无数据" border>
+      <el-table :data="mockDatas"  stripe empty-text="暂无数据" border>
         <el-table-column label="名称" width="180" prop="name"  align="center" />
         <el-table-column label="条件" prop="condition" align="center"/>
         <el-table-column label="创建人" width="140" prop="creator" align="center" />
@@ -50,7 +50,7 @@
               <el-button @click="copyItem(scope.row)" size="mini" type="success" :disabled="!mockData.statussCode">详情</el-button>
               <el-button @click="viewDetails(scope.row)" size="mini" type="primary" :disabled="!mockData.statussCode">编辑</el-button>
               <el-dropdown trigger="click">
-                <el-button style="margin-left: 15px" type="text" @click="toggleActions(scope.row)" size="mini" icon="el-icon-more" :disabled="!mockData.statussCode"></el-button>
+                <el-button style="margin-left: 15px" type="text"  size="mini" icon="el-icon-more" :disabled="!mockData.statussCode"></el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item command="复制" style="color:#409eff" @click="statusClick('已发布',scope.row.id)">
@@ -82,6 +82,37 @@
     <caseResult v-if="runResult" :result="runResult"></caseResult>
   </div>
   </el-scrollbar>
+  <!--  新建期望弹窗-->
+  <el-dialog title="新建" v-model="addDlg" width="60%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
+      <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
+        <el-form-item label="期望名称" prop="name">
+            <el-input v-model="detailData.name"></el-input>
+        </el-form-item>
+        <el-alert type="info" show-icon :closable="false">
+          <p>"Full Name" label is automatically attached to the input:</p>
+        </el-alert>
+        <el-form-item label="参数条件" prop="condition">
+        </el-form-item>
+        <div style="margin-bottom: 30px; font-size: 16px">IP 条件
+          <el-tooltip content="开启后该期望仅对 指定IP 的地址生效" placement="top" effect="light">
+            <i class="el-icon-question" style="margin-left: 4px; color: #909399; font-size: 16px;"></i>
+          </el-tooltip>
+          <el-switch
+            v-model="mockData.statussCode"
+            inline-prompt
+            size="small"
+            @click="switchClick(data)"
+            style="--el-switch-on-color: #53a8ff; margin-left: 10px"
+          />
+        </div>
+        <el-form-item label="返回数据" prop="backData">
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer" style="text-align: right;">
+          <el-button @click="closeDialog" >取 消</el-button>
+          <el-button type="primary" @click="createCron" >保 存</el-button>
+      </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -94,12 +125,14 @@ export default {
   data() {
     return {
       mockDlg:true,
+      addDlg: false,
       mockTitle:'MockUrl: http://139.207.0.0:8080/mock/71b06af7b9c44e17aada1f67e33d81c9/tms/base/otw/uaa/account',
       mockData:{
         method:'',
         statussCode:false,
       },
-      mockDetail:[
+      detailData:{},
+      mockDatas:[
           {
             name:'测试测试1',
             condition:'Query 参数code等于11',
@@ -122,6 +155,15 @@ export default {
 					}
 				]
 			},
+      rulesDetail: {
+        name: [
+          {
+            required: true,
+            message: '请输入期望名称',
+            trigger: 'blur'
+          }
+        ]
+      },
       runResult:{
         "name": "None",
         "type": "api",
@@ -214,9 +256,14 @@ export default {
       this.closeModal()
     },
 
-    toggleActions(row) {
-      // 点击更多操作按钮时，切换显示状态
-      this.showActions = !this.showActions;
+    // 点击新建期望
+    clickAdd() {
+      this.addDlg = true;
+    },
+
+    // 新建期望弹窗关闭
+    closeDialog() {
+      this.addDlg = false;
     },
   },
 created() {
@@ -231,5 +278,9 @@ created() {
   &:hover {
     background-color: #ebf5ff;
   }
+}
+/deep/ .el-form-item--small .el-form-item__label {
+    line-height: 32px;
+    font-size: 16px;
 }
 </style>
