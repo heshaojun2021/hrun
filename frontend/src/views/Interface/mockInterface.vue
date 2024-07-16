@@ -84,54 +84,157 @@
   </el-scrollbar>
   <!--  新建期望弹窗-->
   <el-dialog title="新建期望" v-model="addDlg" width="60%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
-      <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
-        <el-form-item label="期望名称" prop="name">
-            <el-input v-model="detailData.name"></el-input>
-        </el-form-item>
-        <el-alert type="info" show-icon :closable="false">
-          <p>"Full Name" label is automatically attached to the input:</p>
-        </el-alert>
-        <el-form-item label="参数条件" prop="condition">
-        </el-form-item>
-        <div style="margin-bottom: 30px; font-size: 16px">IP 条件
-          <el-tooltip content="开启后该期望仅对 指定IP 的地址生效" placement="top" effect="light">
-            <i class="el-icon-question" style="margin-left: 4px; color: #909399; font-size: 16px;"></i>
-          </el-tooltip>
-          <el-switch
-            v-model="mockData.statussCode"
-            inline-prompt
-            size="small"
-            @click="switchClick(data)"
-            style="--el-switch-on-color: #53a8ff; margin-left: 10px"
-          />
+    <el-scrollbar height="82vh" style="padding-right: 20px;">
+        <div class="system-icon-content">
+          <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
+            <el-form-item label="期望名称" prop="name">
+                <el-input v-model="detailData.name"></el-input>
+            </el-form-item>
+            <el-form-item label="参数条件" prop="conditionData">
+              <el-table :data="detailData.conditionData"  stripe empty-text="暂无数据" border>
+                <el-table-column label="参数位置" width="180" prop="location"  align="center">
+                  <template #default="scope">
+                    <el-select v-model="scope.row.location" placeholder="请选择参数位置" style="width: 155px;color: black;padding: 0px">
+                      <el-option label="query" value="query"/>
+                      <el-option label="path" value="path"/>
+                      <el-option label="header" value="header"/>
+                      <el-option label="body" value="body"/>
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="参数名" prop="paramName" align="center">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.paramName"></el-input>
+                  </template>
+                </el-table-column>
+                <el-table-column label="比较" width="180" prop="comparison" align="center" >
+                  <template #default="scope">
+                    <el-select v-model="scope.row.comparison" placeholder="请选择"  style="width: 155px;color: black;padding: 0px">
+                            <el-option
+                              v-for="item in options"
+                              :key="item.value"
+                              :label="item.label"
+                              :value="item.value"
+                            />
+                    </el-select>
+                  </template>
+                </el-table-column>
+                <el-table-column label="参数值" prop="value" align="center">
+                  <template #default="scope">
+                    <el-input v-model="scope.row.value"></el-input>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="100" align="center">
+                  <template #default="scope">
+                      <el-button
+                        type="text"
+                        size="small"
+                        :disabled="scope.$index < 1"
+                        @click.prevent="deleteRow(scope.$index)"
+                      >  删除
+                      </el-button>
+                  </template>
+                  </el-table-column>
+              </el-table>
+              <el-button style="width: 100%;margin-top: 20px; background-color: #ecf5ff; color: #409eff;" @click="onAddItem" >
+                add Data
+              </el-button>
+            </el-form-item>
+            <div style="margin-bottom: 30px; font-size: 16px">IP 条件
+              <el-tooltip content="开启后该期望仅对 指定IP 的地址生效" placement="top" effect="light">
+                <i class="el-icon-question" style="margin-left: 4px; color: #909399; font-size: 16px;"></i>
+              </el-tooltip>
+              <el-switch
+                v-model="mockData.statussCode"
+                inline-prompt
+                size="small"
+                @click="switchClick(data)"
+                style="--el-switch-on-color: #53a8ff; margin-left: 10px"
+              />
+            </div>
+            <el-form-item label="返回数据" prop="backData">
+              <el-menu
+                  :default-active="activeIndex"
+                  mode="horizontal"
+                  @select="handleSelect"
+                >
+                <el-menu-item index="1">响应体(Response)</el-menu-item>
+                <el-menu-item index="2">响应头(headers)</el-menu-item>
+                <el-menu-item index="3">更多设置</el-menu-item>
+              </el-menu>
+                  <div v-if="activeIndex === '1'" class="munu">
+                      <el-radio-group v-model="paramType" >
+                        <el-radio label="json">application/json</el-radio>
+                        <el-radio label="xml">application/xml</el-radio>
+                        <el-radio label="text">text/plain</el-radio>
+                      </el-radio-group>
+          <!--				<div v-if="paramType === 'json'"><Editor v-model="json"></Editor></div>-->
+          <!--				<div v-else-if="paramType === 'data'"><Editor v-model="data"></Editor></div>-->
+          <!--				<div v-else-if="paramType === 'formData'">-->
+                      <el-tooltip :content="sample" placement="top" effect="light">
+                        <span class="el-icon-question" style="margin-left: 30px;margin-top:-10px;color: #67c23a;">
+                          支持Mock.js语法
+                        </span>
+                      </el-tooltip>
+                    <div ><Editor v-model="json"></Editor></div>
+                  </div>
+
+                  <div v-if="activeIndex === '2'" class="munu">
+                    <span>示例</span>
+                    <div ><Editor v-model="json"></Editor></div>
+                  </div>
+
+                  <div v-if="activeIndex === '3'" class="munu">
+                    <el-form-item label="返回 HTTP 状态码" prop="code" label-position="right" label-width="100px">
+                      <el-input style="width: 150px;" v-model="confData.code"></el-input>
+                    </el-form-item>
+                    <el-form-item label="返回延迟" prop="time">
+                      <el-input style="width: 150px;" v-model="confData.time"></el-input>
+                      S
+                    </el-form-item>
+                  </div>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer" style="text-align: right;">
+              <el-button @click="closeDialog" >取 消</el-button>
+              <el-button type="primary" @click="createCron" >保 存</el-button>
+          </div>
         </div>
-        <el-form-item label="返回数据" prop="backData">
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer" style="text-align: right;">
-          <el-button @click="closeDialog" >取 消</el-button>
-          <el-button type="primary" @click="createCron" >保 存</el-button>
-      </div>
+    </el-scrollbar >
   </el-dialog>
 </template>
 
 <script>
 import caseResult from '@/components/common/caseResult.vue';
+import Editor from "@/components/common/Editor";
 export default {
   props: ['interfaceData'],
   components:{
     caseResult,
+    Editor
   },
   data() {
     return {
       mockDlg:true,
       addDlg: false,
+      activeIndex:'1',
       mockTitle:'MockUrl: http://139.207.0.0:8080/mock/71b06af7b9c44e17aada1f67e33d81c9/tms/base/otw/uaa/account',
       mockData:{
         method:'',
-        statussCode:false,
+        statussCode:true,
       },
-      detailData:{},
+      detailData:{
+        name:'',
+        conditionData:[
+            {
+              location:'',
+              paramName:'',
+              comparison:'',
+              value:''
+            },
+        ],
+        backData:'',
+      },
       mockDatas:[
           {
             name:'测试测试1',
@@ -155,13 +258,31 @@ export default {
 					}
 				]
 			},
+      confData:{
+          code:'200',
+          time:'0'
+        },
       rulesDetail: {
         name: [
           {
             required: true,
             message: '请输入期望名称',
             trigger: 'blur'
-          }
+          },
+        ],
+        code: [
+          {
+            required: true,
+            message: 'code不可为空',
+            trigger: 'blur'
+          },
+        ],
+        time: [
+          {
+            required: true,
+            message: 'time不可为空',
+            trigger: 'blur'
+          },
         ]
       },
       runResult:{
@@ -241,10 +362,28 @@ export default {
         "state": "成功",
         "run_time": "0.0385s"
       },
+      options: [
+          { value: 'equal', label: '等于' },
+          { value: 'notEqual', label: '不等于' },
+          { value: 'contains', label: '包含' },
+          { value: 'notContains', label: '不包含' },
+          { value: 'greaterThan', label: '大于' },
+          { value: 'lessThan', label: '小于' },
+          { value: 'greaterThanOrEqual', label: '大于等于' },
+          { value: 'lessThanOrEqual', label: '小于等于' },
+          { value: 'empty', label: '空' },
+          { value: 'notEmpty', label: '非空' }
+        ],
       statussCode: true,
       showActions: false,
-
-
+      paramType: 'json',
+      sample:"示例\n" +
+          "    {\n" +
+          "        \"name\": \"@name\",\n" +
+          "        \"age\": '@integer(18, 60)',\n" +
+          "        \"birth\": \"@date('yyyy-MM-dd')\",\n" +
+          "        \"email\": \"@email\"\n" +
+          "      }"
     }
   },
   methods:{
@@ -265,6 +404,26 @@ export default {
     closeDialog() {
       this.addDlg = false;
     },
+
+    // 新增表格数据
+    onAddItem() {
+      const newItem = {
+        location: '',
+        paramName: '',
+        comparison: '',
+        value: ''
+      };
+      this.detailData.conditionData.push(newItem);
+    },
+    // 删除表格数据
+    deleteRow(index) {
+      this.detailData.conditionData.splice(index, 1);
+    },
+
+    handleSelect(index) {
+      this.activeIndex = index;
+    }
+
   },
 created() {
     this.mockData = this.interfaceData
@@ -282,5 +441,14 @@ created() {
 /deep/ .el-form-item--small .el-form-item__label {
     line-height: 32px;
     font-size: 16px;
+}
+
+.system-icon-content {
+  max-height: 82vh;
+}
+.munu{
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-bottom: 5px;
 }
 </style>
