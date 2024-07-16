@@ -5,7 +5,7 @@
       <b style="color: #101828CC; font-size: 15px">请求信息</b>
       <span style="color: #606266; font-size: 14px; display: flex; align-items: center;">开启/禁用Mock
         <el-switch
-          v-model="mockData.statussCode"
+          v-model="mockData.statusCode"
           inline-prompt
           size="small"
           @click="switchClick(data)"
@@ -16,7 +16,7 @@
     <el-alert style="margin-bottom: 10px" class="el-icon-circle-check" :title="mockTitle" type="success" />
     <el-form :rules="rulesInterface" ref="interfaceRef" :model="mockData">
       <el-row :gutter="24" >
-        <el-col :span="18">
+        <el-col :span="13">
           <el-form-item prop="url">
               <el-input v-model="mockData.url" placeholder="请输入接口地址" style="font-size: 14px;">
                 <template #prepend >
@@ -30,11 +30,16 @@
                   </el-select>
                 </template>
               </el-input>
-            </el-form-item>
-            </el-col>
-        <el-col :span="6" style="text-align: right;">
-          <el-button @click="runCase" type="success" icon="el-icon-s-promotion" :disabled="!mockData.statussCode">调试</el-button>
-          <el-button @click="addClick" type="primary" icon="el-icon-edit-outline" :disabled="!mockData.statussCode">保存</el-button>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8" >
+          <el-form-item prop="name" label="接口名称">
+              <el-input v-model="mockData.name" placeholder="请输入接口名称" style="font-size: 14px;">
+              </el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="3" >
+          <el-button @click="addClick" type="primary" icon="el-icon-edit-outline" :disabled="!mockData.statusCode">保存</el-button>
         </el-col>
     </el-row>
     </el-form>
@@ -47,10 +52,10 @@
         <el-table-column label="操作" width="200" align="center">
           <template #default="scope">
             <div>
-              <el-button @click="copyItem(scope.row)" size="mini" type="success" :disabled="!mockData.statussCode">详情</el-button>
-              <el-button @click="viewDetails(scope.row)" size="mini" type="primary" :disabled="!mockData.statussCode">编辑</el-button>
+              <el-button @click="copyItem(scope.row)" size="mini" type="success" :disabled="!mockData.statusCode">详情</el-button>
+              <el-button @click="viewDetails(scope.row)" size="mini" type="primary" :disabled="!mockData.statusCode">编辑</el-button>
               <el-dropdown trigger="click">
-                <el-button style="margin-left: 15px" type="text"  size="mini" icon="el-icon-more" :disabled="!mockData.statussCode"></el-button>
+                <el-button style="margin-left: 15px" type="text"  size="mini" icon="el-icon-more" :disabled="!mockData.statusCode"></el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item command="复制" style="color:#409eff" @click="statusClick('已发布',scope.row.id)">
@@ -71,19 +76,42 @@
       type="primary"
       style="margin-bottom: 20px; margin-top: 10px;"
       @click="clickAdd"
-      :disabled="!mockData.statussCode"
+      :disabled="!mockData.statusCode"
     >
       <i class="el-icon-plus" style="margin-right: 5px;"></i>
       新建期望
     </el-button>
-    <div v-if="runResult" style="margin-bottom: 20px">
-      <b style="color: #101828CC; font-size: 15px; margin-bottom: 15px">返回响应</b>
+    <div style="margin-bottom: 20px">
+      <b style="color: #101828CC; font-size: 15px; margin-bottom: 15px">调用记录</b>
+      <el-card style="margin-top: 15px">
+        <el-timeline>
+              <el-timeline-item v-for="(activity, index) in mockLog"
+                                :key="index"
+                                :timestamp="$tools.rTime(activity.create_time)"
+                                placement="top"
+                                color="#0bbd87">
+              <span>
+                <el-tag v-if="activity.method==='GET'" type="success">{{activity.method}}</el-tag>
+                <el-tag v-else >{{activity.method}}</el-tag>
+                <span class="grey-text">{{activity.url}}</span>
+                <span style="font-weight: bold;">调用IP：</span>
+                <span class="grey-text1">{{activity.ip}}</span>
+                <span style="font-weight: bold">HTTP状态码：</span>
+                <span v-if="activity.status_code==='200'" class="grey-text1" style="color:#67c23a;">{{activity.status_code}}</span>
+                <span v-if="activity.status_code==='400'" class="grey-text1" style="color:#e6a23c;">{{activity.status_code}}</span>
+                <span v-if="activity.status_code==='500'" class="grey-text1" style="color:#f56c6c">{{activity.status_code}}</span>
+                <span class="grey-text">{{activity.time_consuming}}</span>
+              </span>
+
+              </el-timeline-item>
+            </el-timeline>
+      </el-card>
     </div>
-    <caseResult v-if="runResult" :result="runResult"></caseResult>
+
   </div>
   </el-scrollbar>
   <!--  新建期望弹窗-->
-  <el-dialog title="新建期望" v-model="addDlg" width="60%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
+  <el-dialog title="新建期望" v-model="addDlg" width="65%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
     <el-scrollbar height="82vh" style="padding-right: 20px;">
         <div class="system-icon-content">
           <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
@@ -142,10 +170,10 @@
             </el-form-item>
             <div style="margin-bottom: 30px; font-size: 16px">IP 条件
               <el-tooltip content="开启后该期望仅对 指定IP 的地址生效" placement="top" effect="light">
-                <i class="el-icon-question" style="margin-left: 4px; color: #909399; font-size: 16px;"></i>
+                <i class="el-icon-question" style="color: #53a8ff; font-size: 16px;"></i>
               </el-tooltip>
               <el-switch
-                v-model="mockData.statussCode"
+                v-model="detailData.statusCode"
                 inline-prompt
                 size="small"
                 @click="switchClick(data)"
@@ -158,7 +186,7 @@
                   mode="horizontal"
                   @select="handleSelect"
                 >
-                <el-menu-item index="1">响应体(Response)</el-menu-item>
+                <el-menu-item index="1">响应体(response)</el-menu-item>
                 <el-menu-item index="2">响应头(headers)</el-menu-item>
                 <el-menu-item index="3">更多设置</el-menu-item>
               </el-menu>
@@ -171,8 +199,8 @@
           <!--				<div v-if="paramType === 'json'"><Editor v-model="json"></Editor></div>-->
           <!--				<div v-else-if="paramType === 'data'"><Editor v-model="data"></Editor></div>-->
           <!--				<div v-else-if="paramType === 'formData'">-->
-                      <el-tooltip :content="sample" placement="top" effect="light">
-                        <span class="el-icon-question" style="margin-left: 30px;margin-top:-10px;color: #67c23a;">
+                      <el-tooltip :content="sampleResponse" placement="top" effect="light">
+                        <span class="el-icon-question" style="margin-left: 30px;color: #67c23a;">
                           支持Mock.js语法
                         </span>
                       </el-tooltip>
@@ -180,8 +208,12 @@
                   </div>
 
                   <div v-if="activeIndex === '2'" class="munu">
-                    <span>示例</span>
-                    <div ><Editor v-model="json"></Editor></div>
+                     <el-tooltip :content="sampleHeader" placement="top" effect="light">
+                      <span class="el-icon-question" style="color: #67c23a;">
+                        示例
+                      </span>
+                    </el-tooltip>
+                    <div ><Editor v-model="headers"></Editor></div>
                   </div>
 
                   <div v-if="activeIndex === '3'" class="munu">
@@ -189,8 +221,16 @@
                       <el-input style="width: 150px;" v-model="confData.code"></el-input>
                     </el-form-item>
                     <el-form-item label="返回延迟" prop="time">
-                      <el-input style="width: 150px;" v-model="confData.time"></el-input>
-                      S
+                    <el-input-number
+                      v-model="confData.time"
+                      :min="0"
+                      :max="999"
+                      size="mini"
+                      controls-position="right"
+                      placeholder="秒"
+                    >
+                    </el-input-number>
+                    <span style="margin-left: 10px">秒</span>
                     </el-form-item>
                   </div>
             </el-form-item>
@@ -221,7 +261,7 @@ export default {
       mockTitle:'MockUrl: http://139.207.0.0:8080/mock/71b06af7b9c44e17aada1f67e33d81c9/tms/base/otw/uaa/account',
       mockData:{
         method:'',
-        statussCode:true,
+        statusCode:true,
       },
       detailData:{
         name:'',
@@ -233,6 +273,7 @@ export default {
               value:''
             },
         ],
+        statusCode:true,
         backData:'',
       },
       mockDatas:[
@@ -254,6 +295,13 @@ export default {
 					{
 						required: true,
 						message: '请输入接口路径信息',
+						trigger: 'blur'
+					}
+				],
+        name: [
+					{
+						required: true,
+						message: '请输入接口名称',
 						trigger: 'blur'
 					}
 				]
@@ -285,83 +333,63 @@ export default {
           },
         ]
       },
-      runResult:{
-        "name": "None",
-        "type": "api",
-        "log_data": [
-            [
-                "INFO",
-                "【INFO】  |   ▶️开始单条用例执行：创建订单"
-            ],
-            [
-                "DEBUG",
-                "【DEBUG】  |   临时变量：\n{}"
-            ],
-            [
-                "DEBUG",
-                "【DEBUG】  |   全局变量：\n{'host': 'https://tmstest.gree.com', 'headers': {}}"
-            ],
-            [
-                "INFO",
-                "【INFO】  |   执行前置脚本"
-            ],
-            [
-                "INFO",
-                "【INFO】  |   发送 POST 请求 : 请求地址：https://tmstest.gree.com/tms/business/out/order/create"
-            ],
-            [
-                "DEBUG",
-                "【DEBUG】  |   请求头：\n{'User-Agent': 'python-requests/2.28.1', 'Accept-Encoding': 'gzip, deflate, br', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'Content-Length': '981'}"
-            ],
-            [
-                "DEBUG",
-                "【DEBUG】  |   请求体：\n{\n  \"fromWarehouseCode\": \"发货实仓地址\",\n  \"fromFinanceWarehouseCode\": \"发货账仓地址\",\n  \"senderName\": \"发货人\",\n  \"senderMobile\": \"发货人荻花\",\n  \"toAddressDetail\": \"目的地\",\n  \"toProvinceCode\": \"目的省\",\n  \"toProvinceName\": \"\",\n  \"toCityCode\": \"目的室\",\n  \"toCityName\": \"\",\n  \"toCountyCode\": \"目的区\",\n  \"toCountyName\": \"\",\n  \"toStreetCode\": \"目的街道\",\n  \"toStreetName\": \"目的\",\n  \"receiverName\": \"收货人\",\n  \"carrierCode\": \"承运商编码\",\n  \"carrierName\": \"\",\n  \"transportTypeCode\": \"承运类型编码\",\n  \"transportTypeName\": \"承运类型名称\",\n  \"num\": \"货物数量\",\n  \"totalVolume\": \"货物总体积\",\n  \"totalWeight\": \"货物总重量\",\n  \"materialName\": \"货物名称\",\n  \"priority\": \"1-一般 2紧急\",\n  \"remark\": \"备注\"\n}"
-            ],
-            [
-                "INFO",
-                "【INFO】  |   请求响应状态码:401"
-            ],
-            [
-                "DEBUG",
-                "【DEBUG】  |   响应头：\n{'Date': 'Sun, 14 Jul 2024 15:51:01 GMT', 'Content-Type': 'application/json;charset=UTF-8', 'Content-Length': '24', 'Connection': 'keep-alive', 'Vary': 'Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, Access-Control-Request-Method, Access-Control-Request-Headers', 'Server': 'elb'}"
-            ],
-            [
-                "DEBUG",
-                "【DEBUG】  |   响应体：\n{\n  \"data\": {},\n  \"result\": 401\n}"
-            ],
-            [
-                "INFO",
-                "【INFO】  |   执行后置脚本"
-            ],
-            [
-                "INFO",
-                "【INFO】  |   ⏹️步骤运行结束"
-            ]
-        ],
-        "url": "https://tmstest.gree.com/tms/business/out/order/create",
-        "method": "POST",
-        "status_cede": 401,
-        "response_header": {
-            "Date": "Sun, 14 Jul 2024 15:51:01 GMT",
-            "Content-Type": "application/json;charset=UTF-8",
-            "Content-Length": "24",
-            "Connection": "keep-alive",
-            "Vary": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
-            "Server": "elb"
-        },
-        "requests_header": {
-            "User-Agent": "python-requests/2.28.1",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept": "*/*",
-            "Connection": "keep-alive",
-            "Content-Type": "application/json",
-            "Content-Length": "981"
-        },
-        "response_body": "{\n  \"data\": {},\n  \"result\": 401\n}",
-        "requests_body": "{\n  \"fromWarehouseCode\": \"发货实仓地址\",\n  \"fromFinanceWarehouseCode\": \"发货账仓地址\",\n  \"senderName\": \"发货人\",\n  \"senderMobile\": \"发货人荻花\",\n  \"toAddressDetail\": \"目的地\",\n  \"toProvinceCode\": \"目的省\",\n  \"toProvinceName\": \"\",\n  \"toCityCode\": \"目的室\",\n  \"toCityName\": \"\",\n  \"toCountyCode\": \"目的区\",\n  \"toCountyName\": \"\",\n  \"toStreetCode\": \"目的街道\",\n  \"toStreetName\": \"目的\",\n  \"receiverName\": \"收货人\",\n  \"carrierCode\": \"承运商编码\",\n  \"carrierName\": \"\",\n  \"transportTypeCode\": \"承运类型编码\",\n  \"transportTypeName\": \"承运类型名称\",\n  \"num\": \"货物数量\",\n  \"totalVolume\": \"货物总体积\",\n  \"totalWeight\": \"货物总重量\",\n  \"materialName\": \"货物名称\",\n  \"priority\": \"1-一般 2紧急\",\n  \"remark\": \"备注\"\n}",
-        "state": "成功",
-        "run_time": "0.0385s"
-      },
+      mockLog:[{
+            "create_time": "2024-02-18T10:30:00",
+            "method": "GET",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.1",
+            "status_code": "200",
+            "time_consuming": "0.1s",
+          },
+          {
+            "create_time": "2024-02-18T10:30:00",
+            "method": "GET",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.1",
+            "status_code": "200",
+            "time_consuming": "0.1s",
+          },
+          {
+            "create_time": "2024-02-18T10:30:00",
+            "method": "POST",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.101",
+            "status_code": "400",
+            "time_consuming": "0.1s",
+          },
+          {
+            "create_time": "2024-02-18T10:30:00",
+            "method": "POST",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.1",
+            "status_code": "200",
+            "time_consuming": "0.5s",
+          },
+          {
+            "create_time": "2024-02-18T10:30:00",
+            "method": "POST",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.1",
+            "status_code": "200",
+            "time_consuming": "0.5s",
+          },
+          {
+            "create_time": "2024-02-18T10:30:00",
+            "method": "POST",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.1",
+            "status_code": "200",
+            "time_consuming": "0.5s",
+          },
+          {
+            "create_time": "2024-02-18T10:30:00",
+            "method": "POST",
+            "url": "/api/v1/user/login",
+            "ip": "192.168.1.1",
+            "status_code": "200",
+            "time_consuming": "0.5s",
+          }
+          ],
       options: [
           { value: 'equal', label: '等于' },
           { value: 'notEqual', label: '不等于' },
@@ -374,16 +402,20 @@ export default {
           { value: 'empty', label: '空' },
           { value: 'notEmpty', label: '非空' }
         ],
-      statussCode: true,
       showActions: false,
       paramType: 'json',
-      sample:"示例\n" +
+      sampleResponse:"示例\n" +
           "    {\n" +
           "        \"name\": \"@name\",\n" +
           "        \"age\": '@integer(18, 60)',\n" +
           "        \"birth\": \"@date('yyyy-MM-dd')\",\n" +
           "        \"email\": \"@email\"\n" +
+          "      }",
+      sampleHeader: "{\n" +
+          "        \"Content-Type\": \"application/json\",\n" +
+          "        \"Authorization\": \"Bearer {{token}}\"\n" +
           "      }"
+
     }
   },
   methods:{
