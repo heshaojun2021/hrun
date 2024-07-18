@@ -162,7 +162,7 @@ class MockDetail(BaseModel):
 
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
     class Meta:
         db_table = 'mockDetail'
@@ -179,7 +179,7 @@ class MockDetailForm(models.Model):
     paramValue = models.CharField(max_length=50, help_text='参数值', verbose_name='参数值')
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         db_table = 'mockDetailForm'
