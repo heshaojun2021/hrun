@@ -4,8 +4,10 @@
 
 from rest_framework import serializers
 
-from .models import Project, TestEnv, TreeNode, newInterface
-from rest_framework.validators import UniqueValidator
+from .models import Project, TestEnv, TreeNode, newInterface, \
+    Mock, MockDetail, MockDetailForm, MockLog
+
+
 
 class ProjectSerializer(serializers.ModelSerializer):
 
@@ -48,4 +50,45 @@ class newInterfaceSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = newInterface
+        fields = '__all__'
+
+
+
+
+class MockDetailFormSerializer(serializers.ModelSerializer):
+    """
+    mock接口详情表单序列化器
+    """
+    class Meta:
+        model = MockDetailForm
+        fields = '__all__'
+
+class MockDetailSerializer(serializers.ModelSerializer):
+    """
+    mock接口详情序列化器
+    """
+    detailForm = MockDetailFormSerializer(many=True, required=False, allow_null=True)
+
+    class Meta:
+        model = MockDetail
+        fields = '__all__'
+
+class MockSerializer(serializers.ModelSerializer):
+    """
+    mock接口序列化器
+    """
+    MockDetail = MockDetailSerializer(many=True, required=False, allow_null=True)
+
+    class Meta:
+        model = Mock
+        fields = '__all__'
+
+
+
+class MockLogSerializer(serializers.ModelSerializer):
+    """
+    mock接口日志序列化器
+    """
+    class Meta:
+        model = MockLog
         fields = '__all__'

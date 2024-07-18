@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
 # @author: HRUN
 
-from django.db.models import ProtectedError
 from rest_framework import status
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from common.Error_customization import CustomException
-from common.pagination import TenPerPageNumberPagination
 from public.models import StatisticalRecord
 from users.models import User
-from .models import Project, TestEnv, TreeNode, newInterface
-from .permissions import IsAuthenticatedOrReadOnly,ProjectPermission
+from .models import Project, TestEnv, TreeNode, newInterface, \
+    MockLog, MockDetail, MockDetailForm, Mock
+from .permissions import IsAuthenticatedOrReadOnly, ProjectPermission
 from .serializers import ProjectSerializer, TestEnvSerializer, TreeNodeSerializer, \
-    newInterfaceSerializer
+    newInterfaceSerializer, MockSerializer, MockLogSerializer, MockDetailSerializer, MockDetailFormSerializer
 from .filters import treeFilter, newInterfaceFilter
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
-from testplans.tasks import run_case, run_scene, run_plan
+from testplans.tasks import run_case
 
 class ProjectViewSet(ModelViewSet):
     """项目视图集"""
@@ -54,10 +52,6 @@ class ProjectViewSet(ModelViewSet):
             queryset = queryset.none()
         return queryset
 
-
-
-
-
 class TestEnvViewSet(ModelViewSet):
     queryset = TestEnv.objects.all()
     serializer_class = TestEnvSerializer
@@ -72,7 +66,6 @@ class TestEnvViewSet(ModelViewSet):
             queryset = queryset.filter(project=project)
 
         return queryset
-
 
 class TreeNodeViewSet(ModelViewSet):
     queryset = TreeNode.objects.filter(parent_id=None).order_by('create_time')
@@ -154,3 +147,30 @@ class newInterfaceViewSet(ModelViewSet):
 
         return Response(res)
 
+class mockViewSet(ModelViewSet):
+    """mock接口视图集"""
+    queryset = Mock.objects.all()
+    serializer_class = MockSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class mockDetailViewSet(ModelViewSet):
+    """mock接口详情视图集"""
+    queryset = MockDetail.objects.all()
+    serializer_class = MockDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+
+
+class mockDetailFormViewSet(ModelViewSet):
+    """mock接口详情表单视图集"""
+    queryset = MockDetailForm.objects.all()
+    serializer_class = MockDetailFormSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class mockLogViewSet(ModelViewSet):
+    """mock接口日志视图集"""
+    queryset = MockLog.objects.all()
+    serializer_class = MockLogSerializer
+    permission_classes = [IsAuthenticated]

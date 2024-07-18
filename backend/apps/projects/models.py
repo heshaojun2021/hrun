@@ -137,12 +137,12 @@ class newInterface(models.Model):
 
 class Mock(BaseModel):
     """mock接口表"""
-    newInterface = models.OneToOneField(newInterface, on_delete=models.CASCADE, help_text='接口id', verbose_name='接口id',)
+    newInterface = models.OneToOneField(newInterface, on_delete=models.CASCADE, help_text='接口id', verbose_name='mock',)
     status = models.IntegerField(verbose_name='状态', help_text='状态', null=True, blank=True, default=0)
-    mockId =models.CharField(max_length=32, default=generate_uuid, unique=True)
+    mockId = models.CharField(max_length=32, default=generate_uuid, unique=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         db_table = 'mock'
@@ -153,26 +153,26 @@ class Mock(BaseModel):
 
 class MockDetail(BaseModel):
     """mock接口详情表"""
-    mock = models.ForeignKey(Mock, on_delete=models.CASCADE, help_text='mock', verbose_name='mock')
+    mock = models.ForeignKey(Mock, on_delete=models.CASCADE, help_text='mock', related_name='MockDetail')
     name = models.CharField(max_length=50, help_text='期望名称', verbose_name='期望名称')
     ipCode = models.IntegerField(verbose_name='指定生效ip', help_text='指定生效ip', null=True, blank=True, default=0)
     headers = models.JSONField(help_text='响应头', verbose_name='响应头', default=dict, blank=True)
     response = models.JSONField(help_text='响应体', verbose_name='响应体', default=dict, blank=True)
-
+    config = models.JSONField(help_text='配置', verbose_name='配置', default=dict, blank=True)
 
 
     def __str__(self):
         return self.name
 
     class Meta:
-        db_table = 'mock'
+        db_table = 'mockDetail'
         verbose_name = "mock接口详情表"
         verbose_name_plural = verbose_name
 
 
 
 class MockDetailForm(models.Model):
-    mockDetail = models.ForeignKey(MockDetail, on_delete=models.CASCADE, help_text='mock详情', verbose_name='mock详情')
+    mockDetail = models.ForeignKey(MockDetail, on_delete=models.CASCADE, help_text='mock详情', verbose_name='detailForm')
     location = models.CharField(max_length=50, help_text='参数位置', verbose_name='参数位置')
     paramName = models.CharField(max_length=50, help_text='参数名称', verbose_name='参数名称')
     comparison = models.CharField(max_length=50, help_text='比较方式', verbose_name='比较方式')
@@ -199,7 +199,7 @@ class MockLog(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return self.id
 
     class Meta:
         db_table = 'mockLog'
