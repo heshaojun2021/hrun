@@ -24,26 +24,6 @@ class Project(models.Model):
         verbose_name = "项目表"
         verbose_name_plural = verbose_name
 
-    # def info(self):
-    #     """返回项目的统计信息"""
-    #     return [
-    #         {'name': '执行环境', 'value': self.test_envs.count()},
-    #         {'name': '测试场景', 'value': self.testcase.count()},
-    #         {'name': '测试计划', 'value': self.test_plans.count()},
-    #         {'name': '接口数量', 'value': self.new_interface.count()},
-    #         {'name': '定时任务', 'value': self.crontab_jobs.count()},
-    #         {'name': '执行记录', 'value': Record.objects.filter(plan__project=self).count()},
-    #         ]
-    #
-    # def bugs(self):
-    #     """返回项目的bugs统计信息"""
-    #     return [
-    #         {'name': '待处理', 'value': self.bug_set.filter(status='待处理').count()},
-    #         {'name': '处理中', 'value': self.bug_set.filter(status='处理中').count()},
-    #         {'name': '已关闭', 'value': self.bug_set.filter(status='已关闭').count()},
-    #         {'name': '处理完成', 'value': self.bug_set.filter(status='处理完成').count()},
-    #         {'name': '无需处理', 'value': self.bug_set.filter(status='无需处理').count()}
-    #     ]
 
 
 class TestEnv(models.Model):
@@ -65,29 +45,6 @@ class TestEnv(models.Model):
     class Meta:
         db_table = 'tb_test_env'
         verbose_name = "测试环境表"
-        verbose_name_plural = verbose_name
-
-
-class Interface(models.Model):
-    """接口表"""
-    CHOICES = [
-        ('1', '项目接口'),
-        ('2', '三方接口')
-    ]
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, help_text='项目id', verbose_name='项目id',
-                                related_name='interfaces')
-    name = models.CharField(max_length=50, help_text='接口名称', verbose_name='接口名')
-    url = models.CharField(max_length=200, help_text='接口路径', verbose_name='接口路径')
-    method = models.CharField(max_length=50, help_text='请求方法', verbose_name='请求方法')
-    type = models.CharField(verbose_name='接口类型', help_text='接口类型', max_length=40, choices=CHOICES, default='1')
-    create_time = models.DateTimeField(verbose_name='创建时间', help_text='创建时间', auto_now_add=True, null=True, blank=True)
-
-    def __str__(self):
-        return self.url
-
-    class Meta:
-        db_table = 'tb_interface'
-        verbose_name = '接口表'
         verbose_name_plural = verbose_name
 
 

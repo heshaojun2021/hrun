@@ -3,16 +3,10 @@
 
 from django_filters import rest_framework as filters
 
-from .models import TestStep, TestCase, TestPlan
+from .models import TestCase, TestPlan
 
 
-class TestStepFilterSet(filters.FilterSet):
-    """测试步骤过滤器"""
-    scene = filters.NumberFilter(field_name='scenedata__scene')
 
-    class Meta:
-        model = TestStep
-        fields = ['scene', 'interface']
 
 
 class TestCaseFilter(filters.FilterSet):

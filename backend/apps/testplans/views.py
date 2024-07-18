@@ -15,47 +15,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from common.pagination import TenPerPageNumberPagination
 from projects.models import TestEnv, newInterface, Project
-from .models import TestStep, TestPlan, TestScene, SceneData, UploadFile, CrontabTask, TestCase, CaseStepData, \
-    StepController
+from .models import  TestPlan, UploadFile, CrontabTask, TestCase, CaseStepData, StepController
 from public.models import StatisticalRecord
 from .serializers import (
-    TestStepSerializer, TestStepRetrieveSerializer, UploadFileSerializer,
-    TestSceneSerializer, TestSceneStepSerializer, TestPlanSerializer,
-    RecordSerializer, CrontabTaskSerializer, TestCaseSerializer, TestCaseStepSerializer, StepControllerSerializer
+     UploadFileSerializer,TestPlanSerializer,RecordSerializer, CrontabTaskSerializer,
+     TestCaseSerializer, TestCaseStepSerializer, StepControllerSerializer
 )
-from .filters import TestStepFilterSet, TestCaseFilter, TestPlanFilter
+from .filters import TestCaseFilter, TestPlanFilter
 from .tasks import run_case, run_scene, run_plan
 
-
-
-class TestStepViewSet(ModelViewSet):
-    """测试步骤视图集"""
-    queryset = TestStep.objects.all()
-    serializer_class = TestStepSerializer
-    permission_classes = [IsAuthenticated]
-    filterset_class = TestStepFilterSet
-
-    # 复写get_serializer_class方法，实现不同的操作使用不同的序列化器
-    # list create retrieve update partial_update destroy
-    def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return TestStepRetrieveSerializer
-        return self.serializer_class
-
-    @action(methods=['post'], detail=False)
-    def run(self, request, *args, **kwargs):
-        # 1. 获取测试数据
-        cases = request.data.get('data')
-        env_id = request.data.get('env')
-        if not env_id:
-            raise ValidationError('请求参数env必填')
-        try:
-            TestEnv.objects.get(id=env_id)
-        except:
-            raise ValidationError('参数env传入的值无效')
-
-        res = run_case(cases=cases, env_id=env_id)
-        return Response(res)
 
 
 class UploadFileViewSet(ModelViewSet):
@@ -90,53 +58,6 @@ class UploadFileViewSet(ModelViewSet):
         instance.delete()
 
 
-class TestSceneViewSet(ModelViewSet):
-    """测试场景视图集"""
-    queryset = TestScene.objects.all()
-    serializer_class = TestSceneSerializer
-    permission_classes = [IsAuthenticated]
-    filterset_fields = ('testplan', 'project')
-
-    @action(methods=['post'], detail=True)
-    def run(self, request, pk):
-        # 1. 获取环境id
-        env_id = request.data.get('env')
-        # 2. 执行测试场景
-        res = run_scene(pk, env_id)
-        return Response(res)
-
-
-class TestSceneStepViewSet(ModelViewSet):
-    """测试场景步骤视图集"""
-    queryset = SceneData.objects.all().order_by('sort')
-    serializer_class = TestSceneStepSerializer
-    permission_classes = [IsAuthenticated]
-    filterset_fields = ['scene']
-
-    # order方法就是实际的视图方法，写法跟普通的类视图中的视图方法写法一致
-    # 装饰器action需要修饰整个额外的方法
-    # 其中参数methods接受列表，表示要处理的http请求方法
-    # 额外的方法会自动生成路由，默认情况会使用方法的名称
-    # 例如 /test_scene_steps/order/
-    # 参数detail=True时，表示要处理单个的对象，生成的url为/test_scene_steps/<int:pk>/order/
-    # 参数detail=False时，表示要处理查询集，生成的url为/test_scene_steps/order/
-    # 想要自定url，不是使用默认的方法名做url，使用参数url_path,
-    # 例如url_path='aaa',那么生成的url为/test_scene_steps/aaa/
-    # 默认的url_name是模型名小写_方法名，可以 通过url_name参数自己指定
-    # 比如url_name='aabbcc',生成的name就是模型名小写_aabbcc
-    @action(methods=['put'], detail=False)
-    def order(self, request, *args, **kwargs):
-        """排序接口"""
-        objs = []
-        # request.data中就是前端传递过来的场景步骤列表
-        for item in request.data:
-            obj = SceneData.objects.get(pk=item['id'])
-            obj.sort = item['sort']
-            objs.append(obj)
-            obj.save()  # 单独保存
-        # 批量保存 推荐大量数据的时候使用
-        # SceneData.objects.bulk_update(objs, ['sort'])
-        return Response(request.data)
 
 class TestCaseStepViewSet(ModelViewSet):
     """测试用例步骤视图集"""

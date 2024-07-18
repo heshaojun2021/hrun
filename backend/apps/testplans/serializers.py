@@ -5,33 +5,10 @@ from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 from rest_framework.validators import UniqueValidator
 
-from projects.serializers import InterfaceSerializer, ProjectSerializer
+from projects.serializers import ProjectSerializer
 from reports.serializers import RecordSerializer
-from .models import TestStep, TestPlan, TestScene, SceneData, UploadFile, CrontabTask, TestCase, CaseStepData, \
-    StepController
+from .models import TestPlan, UploadFile, CrontabTask, TestCase, CaseStepData, StepController
 from projects.models import newInterface
-
-class TestStepSerializer(serializers.ModelSerializer):
-    """
-    测试步骤序列化器
-    """
-
-    class Meta:
-        model = TestStep
-        fields = '__all__'
-
-
-class TestStepRetrieveSerializer(serializers.ModelSerializer):
-    """
-    测试步骤详情序列化器
-    """
-    interface = InterfaceSerializer()
-
-    class Meta:
-        model = TestStep
-        fields = '__all__'
-        # depth = 1
-
 
 class UploadFileSerializer(serializers.ModelSerializer):
     """文件上传序列化器"""
@@ -42,27 +19,6 @@ class UploadFileSerializer(serializers.ModelSerializer):
         extra_kwargs = {'file': {'write_only': True}, 'info': {'read_only': True}}
 
 
-class TestSceneSerializer(serializers.ModelSerializer):
-    """测试场景序列化器"""
-    class Meta:
-        model = TestScene
-        fields = '__all__'
-
-
-class NestTestStepSerializer(serializers.ModelSerializer):
-    """嵌套测试步骤序列化器"""
-    class Meta:
-        model = TestStep
-        fields = ['id', 'title']
-
-
-class TestSceneStepSerializer(serializers.ModelSerializer):
-    """测试场景步骤序列化器"""
-    stepInfo = NestTestStepSerializer(read_only=True, source='step')
-
-    class Meta:
-        model = SceneData
-        fields = '__all__'
 
 
 class TestPlanSerializer(serializers.ModelSerializer):
@@ -70,34 +26,6 @@ class TestPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestPlan
         fields = '__all__'
-
-
-class TestStepRunSerializer(serializers.ModelSerializer):
-    """测试步骤序运行序列化器"""
-    interface = InterfaceSerializer()
-
-    class Meta:
-        model = TestStep
-        fields = '__all__'
-
-
-class TestSceneStepRunSerializer(serializers.ModelSerializer):
-    """测试场景步骤运行序列化器"""
-    step = TestStepRunSerializer()
-
-    class Meta:
-        model = SceneData
-        fields = '__all__'
-
-
-class TestSceneRunSerializer(serializers.ModelSerializer):
-    """测试场景运行序列化器"""
-    scenedata_set = TestSceneStepRunSerializer(many=True)
-
-    class Meta:
-        model = TestScene
-        fields = '__all__'
-
 
 
 class TestCaseSerializer(serializers.ModelSerializer):
@@ -261,7 +189,6 @@ class TestCaseDataRunSerializer(serializers.ModelSerializer):
 
 
 class TestPlanRunSerializer(serializers.ModelSerializer):
-    scenes = TestSceneRunSerializer(many=True)
     new_scenes = TestCaseDataRunSerializer(many=True)
     class Meta:
         model = TestPlan

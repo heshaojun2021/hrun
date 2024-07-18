@@ -11,11 +11,11 @@ from common.Error_customization import CustomException
 from common.pagination import TenPerPageNumberPagination
 from public.models import StatisticalRecord
 from users.models import User
-from .models import Project, Interface, TestEnv, TreeNode, newInterface
+from .models import Project, TestEnv, TreeNode, newInterface
 from .permissions import IsAuthenticatedOrReadOnly,ProjectPermission
-from .serializers import ProjectSerializer, InterfaceSerializer, TestEnvSerializer, TreeNodeSerializer, \
+from .serializers import ProjectSerializer, TestEnvSerializer, TreeNodeSerializer, \
     newInterfaceSerializer
-from .filters import InterfaceFilter, treeFilter, newInterfaceFilter
+from .filters import treeFilter, newInterfaceFilter
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
@@ -54,22 +54,6 @@ class ProjectViewSet(ModelViewSet):
             queryset = queryset.none()
         return queryset
 
-
-
-class InterfaceViewSet(ModelViewSet):
-    """接口视图集"""
-    queryset = Interface.objects.all()
-    serializer_class = InterfaceSerializer
-    permission_classes = [IsAuthenticated]
-    filterset_class = InterfaceFilter
-    pagination_class = TenPerPageNumberPagination
-    # filterset_fields = ['project', 'type']
-
-    def perform_destroy(self, instance):
-        try:
-            instance.delete()
-        except ProtectedError as e:
-            raise CustomException()
 
 
 

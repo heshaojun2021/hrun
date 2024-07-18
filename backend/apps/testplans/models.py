@@ -18,7 +18,6 @@ class TestPlan(models.Model):
     name = models.CharField(max_length=150, help_text='计划名', verbose_name='计划名')
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, help_text='项目id', verbose_name='项目id',
                                 related_name='test_plans')
-    scenes = models.ManyToManyField('TestScene', help_text='包含的测试场景', verbose_name='包含的测试场景', blank=True)
     new_scenes = models.ManyToManyField('TestCase', help_text='包含的测试场景', verbose_name='包含的测试场景', blank=True)
     def __str__(self):
         return self.name
@@ -28,70 +27,7 @@ class TestPlan(models.Model):
         verbose_name_plural = "测试计划表"
 
 
-class TestScene(models.Model):
-    """测试场景/测试套件"""
-    project = models.ForeignKey('projects.Project', help_text='所属项目', verbose_name='项目名称',
-                                on_delete=models.PROTECT, related_name='test_scenes')
-    name = models.CharField(max_length=50, help_text='测试场景名', verbose_name='测试场景名')
 
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'tb_test_scene'
-        verbose_name = "测试场景"
-        verbose_name_plural = verbose_name
-
-
-class SceneData(models.Model):
-    """场景/套件数据"""
-    step = models.ForeignKey('TestStep', help_text='步骤', verbose_name='步骤', on_delete=models.PROTECT)
-    scene = models.ForeignKey(TestScene, help_text='场景', verbose_name='场景', on_delete=models.PROTECT)
-    sort = models.IntegerField(help_text='执行顺序', verbose_name='执行顺序', blank=True)
-
-    def __str__(self):
-        return str(self.id)
-
-    class Meta:
-        db_table = 'tb_scene_data'
-        verbose_name = "场景步骤"
-        verbose_name_plural = verbose_name
-
-
-setup_script = """# 前置脚本(python):
-# global_tools:全局工具函数
-# data:用例数据 
-# env: 局部环境
-# ENV: 全局环境
-# db: 数据库操作对象
-"""
-teardown_script = """# 后置脚本(python):
-# global_tools:全局工具函数
-# data:用例数据 
-# response:响应对象response 
-# env: 局部环境
-# ENV: 全局环境
-# db: 数据库操作对象
-"""
-
-
-class TestStep(models.Model):
-    """用例表"""
-    title = models.CharField(max_length=50, help_text='用例名称', verbose_name='用例名')
-    interface = models.ForeignKey('projects.Interface', on_delete=models.CASCADE, help_text='接口', verbose_name='接口')
-    headers = models.JSONField(help_text='请求头', verbose_name='请求头', default=dict, blank=True)
-    request = models.JSONField(help_text='请求信息', verbose_name='请求信息', default=dict, blank=True)
-    file = models.JSONField(help_text='上传的文件参数', verbose_name='上传的文件', default=list, blank=True)
-    setup_script = models.TextField(help_text='前置脚本', verbose_name='前置脚本', default=setup_script, blank=True)
-    teardown_script = models.TextField(help_text='后置脚本', verbose_name='用例后置脚本', default=teardown_script, blank=True)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        db_table = 'tb_test_step'
-        verbose_name = "测试步骤表"
-        verbose_name_plural = verbose_name
 
 
 class UploadFile(models.Model):
