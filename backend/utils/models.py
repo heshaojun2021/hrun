@@ -8,7 +8,10 @@ class BaseModel(models.Model):
     """模型基类
     定义公共字段
     """
-    is_delete = models.BooleanField('逻辑删除', help_text='逻辑删除', default=False)
+    creator = models.CharField(max_length=50, help_text='创建人', verbose_name='创建人', default='', null=True, blank=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', help_text='创建时间', auto_now_add=True, null=True, blank=True)
+    modifier = models.CharField(max_length=50, help_text='修改人', verbose_name='修改人', default='', null=True, blank=True)
+    update_time = models.DateTimeField(verbose_name='修改时间', help_text='修改时间', auto_now_add=False, null=True, blank=True)
 
     class Meta:
         # 设置为抽象类

@@ -2,11 +2,17 @@
 # @author: HRUN
 
 from pathlib import Path
+import uuid
 
 from django.db import models
 from utils.models import BaseModel
 from reports.models import Record
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+
+def generate_uuid():
+    return uuid.uuid4().hex
+
 
 class Project(models.Model):
     """项目表"""
@@ -126,3 +132,76 @@ class newInterface(models.Model):
         verbose_name = "新接口表"
         verbose_name_plural = verbose_name
 
+
+
+
+class Mock(BaseModel):
+    """mock接口表"""
+    newInterface = models.OneToOneField(newInterface, on_delete=models.CASCADE, help_text='接口id', verbose_name='接口id',)
+    status = models.IntegerField(verbose_name='状态', help_text='状态', null=True, blank=True, default=0)
+    mockId =models.CharField(max_length=32, default=generate_uuid, unique=True)
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        db_table = 'mock'
+        verbose_name = "mock接口表"
+        verbose_name_plural = verbose_name
+
+
+
+class MockDetail(BaseModel):
+    """mock接口详情表"""
+    mock = models.ForeignKey(Mock, on_delete=models.CASCADE, help_text='mock', verbose_name='mock')
+    name = models.CharField(max_length=50, help_text='期望名称', verbose_name='期望名称')
+    ipCode = models.IntegerField(verbose_name='指定生效ip', help_text='指定生效ip', null=True, blank=True, default=0)
+    headers = models.JSONField(help_text='响应头', verbose_name='响应头', default=dict, blank=True)
+    response = models.JSONField(help_text='响应体', verbose_name='响应体', default=dict, blank=True)
+
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'mock'
+        verbose_name = "mock接口详情表"
+        verbose_name_plural = verbose_name
+
+
+
+class MockDetailForm(models.Model):
+    mockDetail = models.ForeignKey(MockDetail, on_delete=models.CASCADE, help_text='mock详情', verbose_name='mock详情')
+    location = models.CharField(max_length=50, help_text='参数位置', verbose_name='参数位置')
+    paramName = models.CharField(max_length=50, help_text='参数名称', verbose_name='参数名称')
+    comparison = models.CharField(max_length=50, help_text='比较方式', verbose_name='比较方式')
+    paramValue = models.CharField(max_length=50, help_text='参数值', verbose_name='参数值')
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        db_table = 'mockDetailForm'
+        verbose_name = "mock详情数据表"
+        verbose_name_plural = verbose_name
+
+
+
+
+class MockLog(models.Model):
+    """mock接口日志表"""
+    interface = models.CharField(max_length=200, help_text='接口路径', verbose_name='接口路径')
+    method = models.CharField(max_length=50, help_text='请求方法', verbose_name='请求方法')
+    status_code = models.IntegerField(verbose_name='状态码', help_text='状态码', null=True, blank=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', help_text='创建时间', auto_now_add=True, null=True, blank=True)
+    callIp = models.CharField(max_length=50, help_text='调用ip', verbose_name='调用ip')
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'mockLog'
+        verbose_name = "mock接口日志表"
+        verbose_name_plural = verbose_name
