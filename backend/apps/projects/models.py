@@ -172,7 +172,7 @@ class MockDetail(BaseModel):
 
 
 class MockDetailForm(models.Model):
-    mockDetail = models.ForeignKey(MockDetail, on_delete=models.CASCADE, help_text='mock详情', verbose_name='detailForm')
+    mockDetail = models.ForeignKey(MockDetail, on_delete=models.CASCADE, help_text='mock详情', related_name='detailForm')
     location = models.CharField(max_length=50, help_text='参数位置', verbose_name='参数位置')
     paramName = models.CharField(max_length=50, help_text='参数名称', verbose_name='参数名称')
     comparison = models.CharField(max_length=50, help_text='比较方式', verbose_name='比较方式')

@@ -68,7 +68,6 @@ class MockDetailSerializer(serializers.ModelSerializer):
     mock接口详情序列化器
     """
     detailForm = MockDetailFormSerializer(many=True, required=False, allow_null=True)
-
     class Meta:
         model = MockDetail
         fields = '__all__'
@@ -78,11 +77,9 @@ class MockSerializer(serializers.ModelSerializer):
     mock接口序列化器
     """
     MockDetail = MockDetailSerializer(many=True, required=False, allow_null=True)
-
     class Meta:
         model = Mock
         fields = '__all__'
-
 
 
 class MockLogSerializer(serializers.ModelSerializer):
