@@ -138,7 +138,10 @@ class newInterface(models.Model):
 class Mock(BaseModel):
     """mock接口表"""
     newInterface = models.OneToOneField(newInterface, on_delete=models.CASCADE, help_text='接口id', verbose_name='mock',)
-    status = models.IntegerField(verbose_name='状态', help_text='状态', null=True, blank=True, default=0)
+    name = models.CharField(max_length=50, help_text='接口名称', verbose_name='接口名')
+    method = models.CharField(max_length=50, help_text='请求方法', verbose_name='请求方法')
+    url = models.CharField(max_length=200, help_text='接口路径', verbose_name='接口路径')
+    status = models.BooleanField(verbose_name='状态', default=False)
     mockId = models.CharField(max_length=32, default=generate_uuid, unique=True)
 
     def __str__(self):
@@ -155,6 +158,7 @@ class MockDetail(BaseModel):
     """mock接口详情表"""
     mock = models.ForeignKey(Mock, on_delete=models.CASCADE, help_text='mock', related_name='MockDetail')
     name = models.CharField(max_length=50, help_text='期望名称', verbose_name='期望名称')
+    conditionForm = models.JSONField(help_text='条件', verbose_name='条件', default=list, blank=True)
     ipCode = models.IntegerField(verbose_name='指定生效ip', help_text='指定生效ip', null=True, blank=True, default=0)
     headers = models.JSONField(help_text='响应头', verbose_name='响应头', default=dict, blank=True)
     response = models.JSONField(help_text='响应体', verbose_name='响应体', default=dict, blank=True)
@@ -168,24 +172,6 @@ class MockDetail(BaseModel):
         db_table = 'mockDetail'
         verbose_name = "mock接口详情表"
         verbose_name_plural = verbose_name
-
-
-
-class MockDetailForm(models.Model):
-    mockDetail = models.ForeignKey(MockDetail, on_delete=models.CASCADE, help_text='mock详情', related_name='detailForm')
-    location = models.CharField(max_length=50, help_text='参数位置', verbose_name='参数位置')
-    paramName = models.CharField(max_length=50, help_text='参数名称', verbose_name='参数名称')
-    comparison = models.CharField(max_length=50, help_text='比较方式', verbose_name='比较方式')
-    paramValue = models.CharField(max_length=50, help_text='参数值', verbose_name='参数值')
-
-    def __str__(self):
-        return str(self.id)
-
-    class Meta:
-        db_table = 'mockDetailForm'
-        verbose_name = "mock详情数据表"
-        verbose_name_plural = verbose_name
-
 
 
 

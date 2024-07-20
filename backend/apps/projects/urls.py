@@ -12,6 +12,5 @@ router.register('treeNode', views.TreeNodeViewSet)
 router.register('newinterfaces', views.newInterfaceViewSet)
 router.register('mock', views.mockViewSet)
 router.register('mock_detail', views.mockDetailViewSet)
-router.register('mock_detail_form', views.mockDetailFormViewSet)
 router.register('mock_log', views.mockLogViewSet)
 urlpatterns = router.urls

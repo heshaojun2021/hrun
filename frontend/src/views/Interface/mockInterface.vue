@@ -5,15 +5,14 @@
       <b style="color: #101828CC; font-size: 15px">请求信息</b>
       <span style="color: #606266; font-size: 14px; display: flex; align-items: center;">开启/禁用Mock
         <el-switch
-          v-model="mockData.statusCode"
+          v-model="mockData.status"
           inline-prompt
           size="small"
-          @click="switchClick(data)"
           style="--el-switch-on-color: #53a8ff; margin-left: 10px"
         />
       </span>
     </div>
-    <el-alert style="margin-bottom: 10px" class="el-icon-circle-check" :title="mockTitle" type="success" />
+    <el-alert v-if="mockData.mockTitle" style="margin-bottom: 10px" class="el-icon-circle-check" :title="mockData.mockTitle" type="success" />
     <el-form :rules="rulesInterface" ref="interfaceRef" :model="mockData">
       <el-row :gutter="24" >
         <el-col :span="13">
@@ -39,29 +38,31 @@
           </el-form-item>
         </el-col>
         <el-col :span="3" >
-          <el-button @click="addClick" type="primary" icon="el-icon-edit-outline" :disabled="!mockData.statusCode">保存</el-button>
+          <el-button v-if="mockData.mockTitle" @click="editMock()" type="primary" icon="el-icon-edit-outline">保存</el-button>
+          <el-button v-else @click="addMock()" type="primary" icon="el-icon-edit-outline">保存</el-button>
+
         </el-col>
     </el-row>
     </el-form>
     <div><b style="color: #101828CC; font-size: 15px">Mock 期望</b></div>
     <div style="margin-top: 15px">
-      <el-table :data="mockDatas"  stripe empty-text="暂无数据" border>
+      <el-table :data="mockData.MockDetail"  stripe empty-text="暂无数据" border>
         <el-table-column label="名称" width="180" prop="name"  align="center" />
         <el-table-column label="条件" prop="condition" align="center"/>
         <el-table-column label="创建人" width="140" prop="creator" align="center" />
         <el-table-column label="操作" width="200" align="center">
           <template #default="scope">
             <div>
-              <el-button @click="copyItem(scope.row)" size="mini" type="success" :disabled="!mockData.statusCode">详情</el-button>
-              <el-button @click="viewDetails(scope.row)" size="mini" type="primary" :disabled="!mockData.statusCode">编辑</el-button>
+              <el-button @click="openDialog('view', scope.row)" size="mini" type="success" :disabled="!mockData.status">详情</el-button>
+              <el-button @click="openDialog('edit', scope.row)" size="mini" type="primary" :disabled="!mockData.status">编辑</el-button>
               <el-dropdown trigger="click">
-                <el-button style="margin-left: 15px" type="text"  size="mini" icon="el-icon-more" :disabled="!mockData.statusCode"></el-button>
+                <el-button style="margin-left: 15px" type="text"  size="mini" icon="el-icon-more" :disabled="!mockData.status"></el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item command="复制" style="color:#409eff" @click="statusClick('已发布',scope.row.id)">
+                      <el-dropdown-item command="复制" style="color:#409eff" @click="copyDetail(scope.row)">
                         复制
                       </el-dropdown-item>
-                      <el-dropdown-item command="删除" style="color:#409eff" @click="statusClick('测试中',scope.row.id)">
+                      <el-dropdown-item command="删除" style="color:#409eff" @click="delDetail(scope.row)">
                         删除
                       </el-dropdown-item>
                     </el-dropdown-menu>
@@ -75,8 +76,8 @@
     <el-button
       type="primary"
       style="margin-bottom: 20px; margin-top: 10px;"
-      @click="clickAdd"
-      :disabled="!mockData.statusCode"
+      @click="openDialog('add')"
+      :disabled="!mockData.status"
     >
       <i class="el-icon-plus" style="margin-right: 5px;"></i>
       新建期望
@@ -111,7 +112,7 @@
   </div>
   </el-scrollbar>
   <!--  新建期望弹窗-->
-  <el-dialog title="新建期望" v-model="addDlg" width="65%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
+  <el-dialog :title="dialogTitle" v-model="dialogVisible" width="65%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
     <el-scrollbar height="82vh" style="padding-right: 20px;">
         <div class="system-icon-content">
           <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
@@ -173,7 +174,7 @@
                 <i class="el-icon-question" style="color: #53a8ff; font-size: 16px;"></i>
               </el-tooltip>
               <el-switch
-                v-model="detailData.statusCode"
+                v-model="detailData.status"
                 inline-prompt
                 size="small"
                 @click="switchClick(data)"
@@ -247,21 +248,30 @@
 <script>
 import caseResult from '@/components/common/caseResult.vue';
 import Editor from "@/components/common/Editor";
+import {ElMessage} from "element-plus";
 export default {
   props: ['interfaceData'],
   components:{
     caseResult,
-    Editor
+    Editor,
+    ElMessage
   },
   data() {
     return {
       mockDlg:true,
-      addDlg: false,
+      dialogVisible: false,
+      dialogType: '', // 对话框类型，用于区分不同类型的对话框
+      dialogTitle: '', // 对话框标题，根据不同类型动态设置
       activeIndex:'1',
-      mockTitle:'MockUrl: http://139.207.0.0:8080/mock/71b06af7b9c44e17aada1f67e33d81c9/tms/base/otw/uaa/account',
       mockData:{
+        id:'',
+        newInterface:'',
         method:'',
-        statusCode:true,
+        name:'',
+        url:'',
+        status:null,
+        mockTitle:'',
+        MockDetail:[]
       },
       detailData:{
         name:'',
@@ -279,13 +289,13 @@ export default {
       mockDatas:[
           {
             name:'测试测试1',
-            condition:'Query 参数code等于11',
+            remark:'Query 参数code等于11',
             creator:'何某',
             id:'1'
           },
           {
             name:'测试测试2',
-            condition:'Query 参数code等于11',
+            remark:'Query 参数code等于11',
             creator:'何某',
             id:'2'
           }
@@ -432,9 +442,10 @@ export default {
       this.addDlg = true;
     },
 
-    // 新建期望弹窗关闭
-    closeDialog() {
-      this.addDlg = false;
+    // 期望弹窗关闭
+    closeDialog(done) {
+      this.dialogVisible = false;
+      done(); // 关闭对话框
     },
 
     // 新增表格数据
@@ -454,11 +465,89 @@ export default {
 
     handleSelect(index) {
       this.activeIndex = index;
-    }
+    },
+
+    // 获取mock数据
+    async getMockData() {
+      const response = await this.$api.getMock(this.interfaceData.id);
+      if (response.status === 200) {
+        this.mockData.id = response.data.id;
+        this.mockData.name = this.interfaceData.name;
+        this.mockData.url = this.interfaceData.url;
+        this.mockData.method = this.interfaceData.method;
+        this.mockData.newInterface = this.interfaceData.id;
+        this.mockData.status = response.data.status;
+        this.mockData.mockTitle = response.data.MockUrl;
+        this.mockData.MockDetail = response.data.MockDetail;
+        }
+      },
+
+    // 保存接口信息
+    async editInterface() {
+      const params = {
+        method:this.mockData.method,
+        name:this.mockData.name,
+        url:this.mockData.url
+      }
+      await this.$api.updatenewInterface(this.interfaceData.id, params);
+    },
+
+    // 保存mock信息
+    async editMock() {
+      const params = {...this.mockData}
+      delete params.mockTitle;
+      delete params.MockDetail;
+      const response = await this.$api.updateMock(this.mockData.id,params);
+      if (response.status === 200) {
+          this.editInterface()
+          this.getMockData()
+      }
+
+    },
+
+    // 新增mock信息
+    async addMock() {
+      const params = {...this.mockData}
+      delete params.id;
+      delete params.mockTitle;
+      delete params.MockDetail;
+      const response = await this.$api.createMock(params);
+      if (response.status === 201) {
+          this.editInterface()
+          this.getMockData()
+      }
+    },
+
+    openDialog(type,data) {
+      this.dialogType = type;
+      this.dialogVisible = true;
+
+      // 根据不同的对话框类型设置标题
+      switch (type) {
+        case 'add':
+          this.dialogTitle = '新建期望';
+          break;
+
+        case 'edit':
+          this.dialogTitle = '编辑期望';
+          this.detailData = data;
+          break;
+
+        case 'view':
+          this.dialogTitle = '查看期望';
+          this.detailData = data;
+          break;
+
+        default:
+          this.dialogTitle = '';
+          break;
+      }
+    },
+
 
   },
 created() {
-    this.mockData = this.interfaceData
+  this.getMockData();
   }
 }
 </script>

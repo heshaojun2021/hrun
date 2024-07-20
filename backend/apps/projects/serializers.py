@@ -5,7 +5,7 @@
 from rest_framework import serializers
 
 from .models import Project, TestEnv, TreeNode, newInterface, \
-    Mock, MockDetail, MockDetailForm, MockLog
+    Mock, MockDetail, MockLog
 
 
 
@@ -55,19 +55,11 @@ class newInterfaceSerializer(serializers.ModelSerializer):
 
 
 
-class MockDetailFormSerializer(serializers.ModelSerializer):
-    """
-    mock接口详情表单序列化器
-    """
-    class Meta:
-        model = MockDetailForm
-        fields = '__all__'
 
 class MockDetailSerializer(serializers.ModelSerializer):
     """
     mock接口详情序列化器
     """
-    detailForm = MockDetailFormSerializer(many=True, required=False, allow_null=True)
     class Meta:
         model = MockDetail
         fields = '__all__'

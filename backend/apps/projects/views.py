@@ -6,13 +6,14 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from public.models import StatisticalRecord
 from users.models import User
 from .models import Project, TestEnv, TreeNode, newInterface, \
-    MockLog, MockDetail, MockDetailForm, Mock
+    MockLog, MockDetail, Mock
 from .permissions import IsAuthenticatedOrReadOnly, ProjectPermission
 from .serializers import ProjectSerializer, TestEnvSerializer, TreeNodeSerializer, \
-    newInterfaceSerializer, MockSerializer, MockLogSerializer, MockDetailSerializer, MockDetailFormSerializer
+    newInterfaceSerializer, MockSerializer, MockLogSerializer, MockDetailSerializer
 from .filters import treeFilter, newInterfaceFilter
 
 from rest_framework.exceptions import ValidationError
@@ -153,6 +154,19 @@ class mockViewSet(ModelViewSet):
     serializer_class = MockSerializer
     permission_classes = [IsAuthenticated]
 
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        interface_id = pk
+        try:
+            mock_instance = Mock.objects.select_related('newInterface').get(newInterface_id=interface_id)
+        except Mock.DoesNotExist:
+            return Response({}, status=status.HTTP_200_OK)
+
+        serializer = MockSerializer(mock_instance)
+        domain = request.build_absolute_uri('/')
+        data = serializer.data
+        data['MockUrl'] = 'MockUrl: ' + domain + data['mockId'] + '/' + data['url']
+
+        return Response(data, status=status.HTTP_200_OK)
 
 class mockDetailViewSet(ModelViewSet):
     """mock接口详情视图集"""
@@ -160,13 +174,6 @@ class mockDetailViewSet(ModelViewSet):
     serializer_class = MockDetailSerializer
     permission_classes = [IsAuthenticated]
 
-
-
-class mockDetailFormViewSet(ModelViewSet):
-    """mock接口详情表单视图集"""
-    queryset = MockDetailForm.objects.all()
-    serializer_class = MockDetailFormSerializer
-    permission_classes = [IsAuthenticated]
 
 
 class mockLogViewSet(ModelViewSet):

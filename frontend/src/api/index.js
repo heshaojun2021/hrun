@@ -608,4 +608,41 @@ export default {
 		return axios.post('/ProjectBoard/', params)
 	},
 
+	// ================接口mock===================
+
+	// 获取单个mock信息
+	getMock(id) {
+		return axios.get(`/mock/${id}/`)
+	},
+
+	// 新增mock接口
+	createMock(params) {
+		return axios.post('/mock/', params)
+	},
+
+	// 修改mock接口
+	updateMock(id, params) {
+		return axios.patch(`/mock/${id}/`, params)
+	},
+
+	// 新增mock期望
+	createDetail(params) {
+		return axios.post('/mock_detail/', params)
+	},
+
+	// 修改mock期望
+	updateDetail(id, params) {
+		return axios.patch(`/mock_detail/${id}/`, params)
+	},
+
+	// 删除mock期望
+	delDetail(id) {
+		return axios.delete(`/mock_detail/${id}/`)
+	},
+
+	// 查看单个mock期望
+	getDetail(id) {
+		return axios.get(`/mock_detail/${id}/`)
+	},
+
 }
