@@ -91,8 +91,6 @@ class MockDetailSerializer(serializers.ModelSerializer):
                 # 构建 remark
                 remark_value = f"{location} 参数 {paramName} {chinese_comparison} {value}"
 
-                # 将 remark 添加到当前 condition 中
-                condition['remark'] = remark_value
                 remark += remark_value + "<br>"
             except KeyError as e:
                 print(f"缺少键错误: {e}")
