@@ -476,7 +476,7 @@ class BaseTest(unittest.TestCase, CaseRunLog):
             if variable == value:
                 if not log_flag:
                     log_flag = True
-                    self.debug_log('✅ 要判断的值{}，要对比的值{}，条件成立，执行相关逻辑'.format(variable,value))
+                    self.debug_log('✅ 要判断的值{}，要对比的值{}，条件成立，执行相关逻辑'.format(variable, value))
                 self.handle_step(case_)
             else:
                 raise AssertionError(self.warning_log('❌ 要判断的值{}，要对比的值{}，条件不成立，不执行相关逻辑'.format(variable, value)))

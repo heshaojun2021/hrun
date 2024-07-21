@@ -640,9 +640,4 @@ export default {
 		return axios.delete(`/mock_detail/${id}/`)
 	},
 
-	// 查看单个mock期望
-	getDetail(id) {
-		return axios.get(`/mock_detail/${id}/`)
-	},
-
 }

@@ -60,6 +60,45 @@ class MockDetailSerializer(serializers.ModelSerializer):
     """
     mock接口详情序列化器
     """
+    def to_representation(self, instance):
+        # 获取序列化后的原始数据
+        data = super().to_representation(instance)
+
+        # 创建一个映射表，用于将比较类型转换为中文
+        comparison_mapping = {
+            'equal': "等于",
+            'notEqual': "不等于",
+            'greaterThan': "大于",
+            'lessThan': "小于",
+            'greaterThanOrEqual': "大于等于",
+            'lessThanOrEqual': "小于等于",
+            'contains': "包含",
+            'notContains': "不包含",
+            'empty': "为空",
+            'notEmpty': "不为空",
+        }
+        remark =''
+        # 遍历每个条件表单条目，添加 remark 字段
+        for condition in data.get('conditionForm', []):
+            try:
+                location = condition["location"]
+                paramName = condition["paramName"]
+                comparison = condition["comparison"]
+                value = condition["value"]
+
+                chinese_comparison = comparison_mapping[comparison]
+
+                # 构建 remark
+                remark_value = f"{location} 参数 {paramName} {chinese_comparison} {value}"
+
+                # 将 remark 添加到当前 condition 中
+                condition['remark'] = remark_value
+                remark += remark_value + "<br>"
+            except KeyError as e:
+                print(f"缺少键错误: {e}")
+        data['remark'] = remark
+
+        return data
     class Meta:
         model = MockDetail
         fields = '__all__'

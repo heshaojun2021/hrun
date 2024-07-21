@@ -164,7 +164,7 @@ class mockViewSet(ModelViewSet):
         serializer = MockSerializer(mock_instance)
         domain = request.build_absolute_uri('/')
         data = serializer.data
-        data['MockUrl'] = 'MockUrl: ' + domain + data['mockId'] + '/' + data['url']
+        data['MockUrl'] = 'MockUrl: ' + domain + data['mockId'] + data['url']
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -173,6 +173,8 @@ class mockDetailViewSet(ModelViewSet):
     queryset = MockDetail.objects.all()
     serializer_class = MockDetailSerializer
     permission_classes = [IsAuthenticated]
+
+
 
 
 

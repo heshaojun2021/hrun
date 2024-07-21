@@ -48,7 +48,12 @@
     <div style="margin-top: 15px">
       <el-table :data="mockData.MockDetail"  stripe empty-text="暂无数据" border>
         <el-table-column label="名称" width="180" prop="name"  align="center" />
-        <el-table-column label="条件" prop="condition" align="center"/>
+        <el-table-column label="条件" prop="remark" align="center">
+          <template #default="scope">
+            <el-tag><div v-html="scope.row.remark"></div></el-tag>
+          </template>
+
+        </el-table-column>
         <el-table-column label="创建人" width="140" prop="creator" align="center" />
         <el-table-column label="操作" width="200" align="center">
           <template #default="scope">
@@ -59,10 +64,10 @@
                 <el-button style="margin-left: 15px" type="text"  size="mini" icon="el-icon-more" :disabled="!mockData.status"></el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
-                      <el-dropdown-item command="复制" style="color:#409eff" @click="copyDetail(scope.row)">
+                      <el-dropdown-item command="复制" style="color:#409eff" @click="copyMockDetail(scope.row)">
                         复制
                       </el-dropdown-item>
-                      <el-dropdown-item command="删除" style="color:#409eff" @click="delDetail(scope.row)">
+                      <el-dropdown-item command="删除" style="color:#409eff" @click="clickDel(scope.row.id)">
                         删除
                       </el-dropdown-item>
                     </el-dropdown-menu>
@@ -112,15 +117,15 @@
   </div>
   </el-scrollbar>
   <!--  新建期望弹窗-->
-  <el-dialog :title="dialogTitle" v-model="dialogVisible" width="65%" :before-close="closeDialog" top="40px" custom-class="class_dialog">
+  <el-dialog :title="dialogTitle" v-model="dialogVisible" width="65%" :before-close="closeDialog" top="40px" destroy-on-close custom-class="class_dialog">
     <el-scrollbar height="82vh" style="padding-right: 20px;">
         <div class="system-icon-content">
           <el-form :model="detailData" :rules="rulesDetail" ref="detailRef" label-position="top">
             <el-form-item label="期望名称" prop="name">
                 <el-input v-model="detailData.name"></el-input>
             </el-form-item>
-            <el-form-item label="参数条件" prop="conditionData">
-              <el-table :data="detailData.conditionData"  stripe empty-text="暂无数据" border>
+            <el-form-item label="参数条件" prop="conditionForm">
+              <el-table :data="detailData.conditionForm"  stripe empty-text="暂无数据" border>
                 <el-table-column label="参数位置" width="180" prop="location"  align="center">
                   <template #default="scope">
                     <el-select v-model="scope.row.location" placeholder="请选择参数位置" style="width: 155px;color: black;padding: 0px">
@@ -165,23 +170,23 @@
                   </template>
                   </el-table-column>
               </el-table>
-              <el-button style="width: 100%;margin-top: 20px; background-color: #ecf5ff; color: #409eff;" @click="onAddItem" >
+              <el-button v-if="dialogTitle !== '查看期望'" style="width: 100%;margin-top: 20px; background-color: #ecf5ff; color: #409eff;" @click="onAddItem" >
                 add Data
               </el-button>
             </el-form-item>
             <div style="margin-bottom: 30px; font-size: 16px">IP 条件
-              <el-tooltip content="开启后该期望仅对 指定IP 的地址生效" placement="top" effect="light">
+              <el-tooltip content="开启后该期望仅对 指定IP 的地址生效; 填写示例：http://127.0.0.1:8080" :enterable="false" placement="top" effect="light">
                 <i class="el-icon-question" style="color: #53a8ff; font-size: 16px;"></i>
               </el-tooltip>
               <el-switch
-                v-model="detailData.status"
+                v-model="detailData.ipCode"
                 inline-prompt
                 size="small"
-                @click="switchClick(data)"
                 style="--el-switch-on-color: #53a8ff; margin-left: 10px"
               />
+              <el-input v-if="detailData.ipCode" style="margin-top: 10px" v-model="detailData.ipInput"></el-input>
             </div>
-            <el-form-item label="返回数据" prop="backData">
+            <el-form-item label="返回数据">
               <el-menu
                   :default-active="activeIndex"
                   mode="horizontal"
@@ -192,20 +197,17 @@
                 <el-menu-item index="3">更多设置</el-menu-item>
               </el-menu>
                   <div v-if="activeIndex === '1'" class="munu">
-                      <el-radio-group v-model="paramType" >
+                      <el-radio-group v-model="detailData.response.paramType" >
                         <el-radio label="json">application/json</el-radio>
                         <el-radio label="xml">application/xml</el-radio>
                         <el-radio label="text">text/plain</el-radio>
                       </el-radio-group>
-          <!--				<div v-if="paramType === 'json'"><Editor v-model="json"></Editor></div>-->
-          <!--				<div v-else-if="paramType === 'data'"><Editor v-model="data"></Editor></div>-->
-          <!--				<div v-else-if="paramType === 'formData'">-->
                       <el-tooltip :content="sampleResponse" placement="top" effect="light">
                         <span class="el-icon-question" style="margin-left: 30px;color: #67c23a;">
                           支持Mock.js语法
                         </span>
                       </el-tooltip>
-                    <div ><Editor v-model="json"></Editor></div>
+                    <div ><Editor v-model="detailData.response.data"></Editor></div>
                   </div>
 
                   <div v-if="activeIndex === '2'" class="munu">
@@ -214,16 +216,16 @@
                         示例
                       </span>
                     </el-tooltip>
-                    <div ><Editor v-model="headers"></Editor></div>
+                    <div ><Editor v-model="detailData.headers"></Editor></div>
                   </div>
 
                   <div v-if="activeIndex === '3'" class="munu">
-                    <el-form-item label="返回 HTTP 状态码" prop="code" label-position="right" label-width="100px">
-                      <el-input style="width: 150px;" v-model="confData.code"></el-input>
+                    <el-form-item label="返回 HTTP 状态码" prop="statusCode" label-position="right" label-width="100px">
+                      <el-input style="width: 150px;" v-model="detailData.config.statusCode"></el-input>
                     </el-form-item>
                     <el-form-item label="返回延迟" prop="time">
                     <el-input-number
-                      v-model="confData.time"
+                      v-model="detailData.config.time"
                       :min="0"
                       :max="999"
                       size="mini"
@@ -238,7 +240,8 @@
           </el-form>
           <div slot="footer" class="dialog-footer" style="text-align: right;">
               <el-button @click="closeDialog" >取 消</el-button>
-              <el-button type="primary" @click="createCron" >保 存</el-button>
+              <el-button v-if="dialogTitle === '新建期望'" type="primary" @click="addMockDetail" >保 存</el-button>
+              <el-button v-if="dialogTitle === '编辑期望'" type="primary" @click="editMockDetail" >保 存</el-button>
           </div>
         </div>
     </el-scrollbar >
@@ -248,13 +251,19 @@
 <script>
 import caseResult from '@/components/common/caseResult.vue';
 import Editor from "@/components/common/Editor";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {mapState} from "vuex";
 export default {
   props: ['interfaceData'],
   components:{
     caseResult,
     Editor,
     ElMessage
+  },
+  computed: {
+    username() {
+			return window.sessionStorage.getItem('username');
+		},
   },
   data() {
     return {
@@ -271,35 +280,28 @@ export default {
         url:'',
         status:null,
         mockTitle:'',
-        MockDetail:[]
+        MockDetail:[],
       },
       detailData:{
+        id:'',
         name:'',
-        conditionData:[
+        conditionForm:[
             {
               location:'',
               paramName:'',
               comparison:'',
               value:''
             },
+
         ],
-        statusCode:true,
-        backData:'',
+        ipCode:false,
+        ipInput:'',
+        response:{paramType: 'json',data:'{}'},
+        headers:'{}',
+        config:{statusCode:'200', time:'0'},
+        creator:'',
+        remark:''
       },
-      mockDatas:[
-          {
-            name:'测试测试1',
-            remark:'Query 参数code等于11',
-            creator:'何某',
-            id:'1'
-          },
-          {
-            name:'测试测试2',
-            remark:'Query 参数code等于11',
-            creator:'何某',
-            id:'2'
-          }
-      ],
       rulesInterface: {
 				url: [
 					{
@@ -316,29 +318,11 @@ export default {
 					}
 				]
 			},
-      confData:{
-          code:'200',
-          time:'0'
-        },
       rulesDetail: {
         name: [
           {
             required: true,
             message: '请输入期望名称',
-            trigger: 'blur'
-          },
-        ],
-        code: [
-          {
-            required: true,
-            message: 'code不可为空',
-            trigger: 'blur'
-          },
-        ],
-        time: [
-          {
-            required: true,
-            message: 'time不可为空',
             trigger: 'blur'
           },
         ]
@@ -412,8 +396,6 @@ export default {
           { value: 'empty', label: '空' },
           { value: 'notEmpty', label: '非空' }
         ],
-      showActions: false,
-      paramType: 'json',
       sampleResponse:"示例\n" +
           "    {\n" +
           "        \"name\": \"@name\",\n" +
@@ -443,9 +425,25 @@ export default {
     },
 
     // 期望弹窗关闭
-    closeDialog(done) {
+    closeDialog() {
       this.dialogVisible = false;
-      done(); // 关闭对话框
+      this.getMockData();
+      this.detailData = {
+                          name:'',
+                          conditionForm:[
+                              {
+                                location:'',
+                                paramName:'',
+                                comparison:'',
+                                value:''
+                              },
+                          ],
+                          ipCode:false,
+                          ipInput:'',
+                          response:{paramType: 'json',data:''},
+                          headers:'',
+                          config:{statusCode:'200', time:'0'}
+      };
     },
 
     // 新增表格数据
@@ -456,11 +454,11 @@ export default {
         comparison: '',
         value: ''
       };
-      this.detailData.conditionData.push(newItem);
+      this.detailData.conditionForm.push(newItem);
     },
     // 删除表格数据
     deleteRow(index) {
-      this.detailData.conditionData.splice(index, 1);
+      this.detailData.conditionForm.splice(index, 1);
     },
 
     handleSelect(index) {
@@ -499,7 +497,12 @@ export default {
       delete params.MockDetail;
       const response = await this.$api.updateMock(this.mockData.id,params);
       if (response.status === 200) {
-          this.editInterface()
+          ElMessage({
+            type: 'success',
+            message: '保存成功',
+            duration: 1000
+          });
+          this.editInterface();
           this.getMockData()
       }
 
@@ -508,17 +511,103 @@ export default {
     // 新增mock信息
     async addMock() {
       const params = {...this.mockData}
+      params.creator = this.username;
       delete params.id;
       delete params.mockTitle;
       delete params.MockDetail;
       const response = await this.$api.createMock(params);
       if (response.status === 201) {
-          this.editInterface()
+          this.editInterface();
           this.getMockData()
       }
     },
 
-    openDialog(type,data) {
+    // 新增mock详情信息
+    async addMockDetail() {
+      const params = {...this.detailData}
+      delete params.id;
+      params.creator = this.username;
+      params.mock = this.mockData.id;
+      console.log(params)
+      const response = await this.$api.createDetail(params);
+      if (response.status === 201) {
+          ElMessage({
+            type: 'success',
+            message: '保存成功',
+            duration: 1000
+          });
+          this.getMockData();
+          this.closeDialog();
+      }
+    },
+
+    // 修改mock详情信息
+    async editMockDetail() {
+      const params = {...this.detailData}
+      delete params.creator;
+      params.modifier = this.username;
+      const response = await this.$api.updateDetail(params.id,params);
+      if (response.status === 200) {
+          ElMessage({
+            type: 'success',
+            message: '保存成功',
+            duration: 1000
+          });
+          this.getMockData();
+          this.closeDialog();
+      }
+    },
+
+    // 复制mock详情信息
+    async copyMockDetail(data) {
+      const params = data
+      delete params.id;
+      params.creator = this.username;
+      params.name = params.name + '_副本';
+      const response = await this.$api.createDetail(params);
+      if (response.status === 201) {
+          ElMessage({
+            type: 'success',
+            message: '保存成功',
+            duration: 1000
+          });
+          this.getMockData()
+      }
+    },
+
+    clickDel(id) {
+			ElMessageBox.confirm('确定要删除该期望吗?', '提示', {
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+				type: 'warning'
+			})
+				.then(() => {
+					this.delMockDetail(id);
+				})
+				.catch(() => {
+					ElMessage({
+						type: 'info',
+						message: '取消删除',
+						duration: 1000
+					});
+				});
+		},
+
+    // 删除mock详情信息
+    async delMockDetail(id) {
+      const response = await this.$api.delDetail(id);
+			if (response.status === 204) {
+        ElMessage({
+          type: 'success',
+          message: '删除成功',
+          duration: 1000
+        });
+        this.getMockData();
+      }
+
+		},
+
+    openDialog(type, data) {
       this.dialogType = type;
       this.dialogVisible = true;
 
