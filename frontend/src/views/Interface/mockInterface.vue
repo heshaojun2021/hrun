@@ -50,7 +50,7 @@
         <el-table-column label="名称" width="180" prop="name"  align="center" />
         <el-table-column label="条件" prop="remark" align="center">
           <template #default="scope">
-            <el-tag><div v-html="scope.row.remark"></div></el-tag>
+            <div style="color: #66b1ff" v-html="scope.row.remark"></div>
           </template>
 
         </el-table-column>
