@@ -20,12 +20,16 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 
+
 from rest_framework.schemas import get_schema_view
 from rest_framework.documentation import include_docs_urls
 from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.views import get_schema_view as yasg_get_schema_view
 from drf_yasg import openapi
+
+from public.views import MockAPIView
+
 
 schema_view = yasg_get_schema_view(
     openapi.Info(
@@ -47,6 +51,7 @@ urlpatterns = [
     path('', include('reports.urls')),
     path('', include('bugs.urls')),
     path('', include('public.urls')),
+    re_path(r'^mock/(?P<mockId>\w+)(?P<path>/.*)$', MockAPIView.as_view()),
     # 给drf的可视化api增加登录功能
     path('restframework/', include('rest_framework.urls')),
     path('openapi/', get_schema_view(

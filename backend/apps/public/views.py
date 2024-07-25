@@ -2,6 +2,7 @@
 # @author: HRUN
 
 from django.core.cache import cache
+from django.http import HttpRequest, HttpResponse
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -73,3 +74,24 @@ class ProjectBoardView(APIView):
                 return Response({"message": "项目不存在"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
+
+
+class MockAPIView(APIView):
+    def get(self, request: HttpRequest, path: str, mockId: str)-> Response:
+        query_params = request.GET
+        params = {}
+        # 处理所有的查询参数
+        for key in query_params.keys():
+            value = query_params.get(key, '')
+            params[key] = value
+
+        return Response({"path": path, "mockId": mockId, **params}, status=status.HTTP_200_OK)
+
+
+    def post(self, request, *args, **kwargs):
+        return Response({"message": '我是post'}, status=status.HTTP_200_OK)
