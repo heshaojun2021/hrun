@@ -51,7 +51,7 @@ urlpatterns = [
     path('', include('reports.urls')),
     path('', include('bugs.urls')),
     path('', include('public.urls')),
-    re_path(r'^mock/(?P<mockId>\w+)(?P<path>/.*)$', MockAPIView.as_view()),
+    re_path(r'^mock/(?P<mock_id>\w+)(?P<path>/.*)$', MockAPIView.as_view()),
     # 给drf的可视化api增加登录功能
     path('restframework/', include('rest_framework.urls')),
     path('openapi/', get_schema_view(

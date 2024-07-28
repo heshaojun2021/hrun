@@ -11,7 +11,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from public.models import WxPush
 from public.serializers import WxPushSerializer
-from projects.models import Project
+from projects.models import Project, Mock, MockDetail
+
 
 from common.pagination import TenPerPageNumberPagination
 from .tasks import import_run_yapi
@@ -79,19 +80,86 @@ class ProjectBoardView(APIView):
 
 
 
+class MockEngine:
+    def __init__(self, request, path, mock_id):
+        self.request = request
+        self.path = path
+        self.mock_id = mock_id
+
+    def verification(self):
+        """
+        mock接口数据校验层
+        """
+        mock_api_detail = []
+        try:
+            mock_api = Mock.objects.get(mockId=self.mock_id)
+            for detail in mock_api.MockDetail.values():
+                mock_api_detail.append(detail)
+
+            if not mock_api.status:
+                return Response({"message": 'mock接口已禁用'}, status=status.HTTP_400_BAD_REQUEST)
+
+            return mock_api_detail, mock_api
+
+        except Mock.DoesNotExist:
+            return Response({"message": 'mock接口不存在'}, status=status.HTTP_404_NOT_FOUND)
+
+    def analytic_data(self, datasets):
+        """
+        mock接口数据分析层
+        """
+        # 遍历数据集
+        for data in datasets:
+            pass
 
 
-class MockAPIView(APIView):
-    def get(self, request: HttpRequest, path: str, mockId: str)-> Response:
-        query_params = request.GET
+    def main(self, method):
+        """
+        mock接口执行层
+        """
+        # 数据校验
+        validation_result = self.verification()
+        # 检查验证结果
+        if isinstance(validation_result, Response):
+            return validation_result
+
+        mock_api_detail, mock_api = validation_result
+        # 数据分析拆解
+        self.analytic_data(mock_api_detail)
+
+        if method == 'GET':
+            return self.get(mock_api_detail, mock_api)
+
+    def get(self, mock_api_detail, mock_api):
+        query_params = self.request.GET
         params = {}
         # 处理所有的查询参数
         for key in query_params.keys():
             value = query_params.get(key, '')
             params[key] = value
 
-        return Response({"path": path, "mockId": mockId, **params}, status=status.HTTP_200_OK)
+        return Response({"path": self.path, "mock_id": self.mock_id, **params}, status=status.HTTP_200_OK)
 
 
-    def post(self, request, *args, **kwargs):
+
+
+
+
+class MockAPIView(APIView):
+    """
+    MockAPIView
+    """
+
+    def get(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        return MockEngine(request, path, mock_id).main(request.method)
+
+
+
+    def post(self, request: HttpRequest, path: str, mock_id: str) -> Response:
         return Response({"message": '我是post'}, status=status.HTTP_200_OK)
+
+    def put(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        return Response({"message": '我是put'}, status=status.HTTP_200_OK)
+
+    def delete(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        pass
