@@ -110,38 +110,49 @@ class MockEngine:
         """
         # 遍历数据集
         for data in datasets:
-            pass
+            self.judge_diff(data.get('conditionForm', []))
 
-    def judge_diff(self,expect_form:dict):
+    def judge_diff(self, expect_form: list):
         """
         mock接口数据判断比对
         """
-        pass
+        if len(expect_form) == 1:
+            params = expect_form[0]
+            print(params)
+        elif len(expect_form) > 1:
+            for params in expect_form:
+                print(params)
 
-    def ip_check(self, ip:str):
+        else:
+            return True
+
+
+
+
+    def ip_check(self, ip: str):
         """
         mock接口ip校验
         """
         pass
 
-    def response(self, data:dict):
+    def response(self, data: dict):
         """
         mock接口响应体处理
         """
 
-    def headers(self, data:dict):
+    def headers(self, data: dict):
         """
         mock接口响应头处理
         """
         pass
 
-    def config(self, data:dict):
+    def config(self, data: dict):
         """
         mock接口设置
         """
         pass
 
-    def main(self, method:str):
+    def main(self, method: str):
         """
         mock接口执行层
         """
