@@ -104,7 +104,7 @@ class MockEngine:
         except Mock.DoesNotExist:
             return Response({"message": 'mock接口不存在'}, status=status.HTTP_404_NOT_FOUND)
 
-    def analytic_data(self, datasets):
+    def analytic_data(self, datasets: list):
         """
         mock接口数据分析层
         """
@@ -112,8 +112,36 @@ class MockEngine:
         for data in datasets:
             pass
 
+    def judge_diff(self,expect_form:dict):
+        """
+        mock接口数据判断比对
+        """
+        pass
 
-    def main(self, method):
+    def ip_check(self, ip:str):
+        """
+        mock接口ip校验
+        """
+        pass
+
+    def response(self, data:dict):
+        """
+        mock接口响应体处理
+        """
+
+    def headers(self, data:dict):
+        """
+        mock接口响应头处理
+        """
+        pass
+
+    def config(self, data:dict):
+        """
+        mock接口设置
+        """
+        pass
+
+    def main(self, method:str):
         """
         mock接口执行层
         """
@@ -130,7 +158,7 @@ class MockEngine:
         if method == 'GET':
             return self.get(mock_api_detail, mock_api)
 
-    def get(self, mock_api_detail, mock_api):
+    def get(self, mock_api_detail:list, mock_api:Mock):
         query_params = self.request.GET
         params = {}
         # 处理所有的查询参数
