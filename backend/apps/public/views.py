@@ -108,32 +108,112 @@ class MockEngine:
         """
         mock接口数据分析层
         """
+        success_count = 0
+        success_data = []
         # 遍历数据集
         for data in datasets:
-            self.judge_diff(data.get('conditionForm', []))
+            compare_result = self.judge_diff(data.get('conditionForm', []))
+            print(compare_result)
+            if compare_result:
+                # 只统计匹配成功的期望 true
+                success_count += 1
+                success_data.append(data)
 
+        if success_count > 1:
+            # 匹配到多个期望
+            return Response({"message": 'mock接口数据集存在多个匹配结果'}, status=status.HTTP_400_BAD_REQUEST)
+
+        elif success_count == 1:
+            return success_data[0]
+
+        else:
+            # 没有设置期望表单或未匹配上
+            return Response({"message": '成功'}, status=status.HTTP_200_OK)
     def judge_diff(self, expect_form: list):
         """
         mock接口数据判断比对
         """
         if len(expect_form) == 1:
             params = expect_form[0]
-            print(params)
+            source = self.data_source(params.get('location'))
+            paramName = params.get('paramName')
+            if paramName in source:
+                for key in source:
+                    source_value = source[key]
+                    comparison = self.comparison(source_value,params.get('comparison'),params.get('value',''))
+                    if comparison:
+                        return True
+                    else:
+                        return False
+            else:
+                return False
+
         elif len(expect_form) > 1:
             for params in expect_form:
-                print(params)
+                source = self.data_source(params.get('location'))
+                paramName = params.get('paramName')
+                if paramName in source:
+                    for key in source:
+                        source_value = source[key]
+                        comparison = self.comparison(source_value, params.get('comparison'), params.get('value', ''))
+                        if comparison:
+                            return True
+                        else:
+                            return False
+                else:
+                    return False
 
         else:
             return True
 
+    def data_source(self,dataType):
+        if dataType == 'query':
+            query_params = self.request.GET
+            params = {}
+            # 处理所有的查询参数
+            for key in query_params.keys():
+                value = query_params.get(key, '')
+                params[key] = value
+            return params
 
+        elif dataType == 'body':
+            return self.request.data
 
+        elif dataType == 'path':
+            return self.path
 
-    def ip_check(self, ip: str):
+        elif dataType == 'header':
+            return self.request.headers
+
+        else:
+            return dict
+
+    def comparison(self,source_value, comparison_type: str, value):
         """
-        mock接口ip校验
+        mock传参比对
+            source_value: 数据源中的值
+            comparison_type: 比对类型
+            value: 比对值
         """
-        pass
+        comparison_mapping = {
+            'equal': lambda x, y: x == y,
+            'notEqual': lambda x, y: x != y,
+            'greaterThan': lambda x, y: x > y,
+            'lessThan': lambda x, y: x < y,
+            'greaterThanOrEqual': lambda x, y: x >= y,
+            'lessThanOrEqual': lambda x, y: x <= y,
+            'contains': lambda x, y: y in x,
+            'notContains': lambda x, y: y not in x,
+            'empty': lambda x, y: x is None,
+            'notEmpty': lambda x, y: x is not None
+        }
+
+        if comparison_type not in comparison_mapping:
+            raise ValueError(f"Invalid comparison type: {comparison_type}")
+
+        return comparison_mapping[comparison_type](source_value, value)
+
+
 
     def response(self, data: dict):
         """
@@ -156,15 +236,39 @@ class MockEngine:
         """
         mock接口执行层
         """
-        # 数据校验
+        # 1、数据校验
         validation_result = self.verification()
         # 检查验证结果
         if isinstance(validation_result, Response):
             return validation_result
-
+        # 2、数据分析
         mock_api_detail, mock_api = validation_result
-        # 数据分析拆解
-        self.analytic_data(mock_api_detail)
+        # 数据匹配
+        analytic_data = self.analytic_data(mock_api_detail)
+        if isinstance(analytic_data, Response):
+            return analytic_data
+        # 3、ip分发校验与结果返回
+        if analytic_data.get('ipCode'):
+            source_ip = self.request.META.get('REMOTE_ADDR')+':' + self.request.META.get('SERVER_PORT')
+            if source_ip in analytic_data.get('ipInput'):
+                # ip校验通过执行通过后的处理
+                self.response()
+                self.headers()
+                self.config()
+            elif analytic_data.get('ipInput','') is None:
+                # ip校验开启了但是没有配置ip，继续获取期望的返回信息
+                self.response()
+                self.headers()
+                self.config()
+
+
+            else:
+                return Response({"message": '访问主机ip校验不通过'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            # 未开启ip校验，继续获取期望的返回信息
+            self.response()
+            self.headers()
+            self.config()
 
         if method == 'GET':
             return self.get(mock_api_detail, mock_api)
