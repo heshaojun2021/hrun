@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # @author: HRUN
+import json
+import time
 
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
@@ -18,7 +20,7 @@ from common.pagination import TenPerPageNumberPagination
 from .tasks import import_run_yapi
 from common.ProjectBoard import ProjectBoard
 
-
+import xml.etree.ElementTree as ET
 
 class WxPushViewSet(ModelViewSet):
     """项目视图集"""
@@ -166,7 +168,7 @@ class MockEngine:
         else:
             return True
 
-    def data_source(self,dataType):
+    def data_source(self, dataType):
         if dataType == 'query':
             query_params = self.request.GET
             params = {}
@@ -188,7 +190,7 @@ class MockEngine:
         else:
             return dict
 
-    def comparison(self,source_value, comparison_type: str, value):
+    def comparison(self, source_value, comparison_type: str, value):
         """
         mock传参比对
             source_value: 数据源中的值
@@ -219,20 +221,44 @@ class MockEngine:
         """
         mock接口响应体处理
         """
+        response_data = data.get('data')
+        if data.get('paramType') == 'json':
+            if response_data is not None:
+                return response_data
+            else:
+                return json.dumps({})
+        elif data.get('paramType') == 'xml':
+            if response_data is not None:
+            #     root = ET.Element('person')  # 创建根节点
+            #     for key, value in response_data.items():
+            #         child = ET.Element(key)  # 创建子节点
+            #         child.text = str(value)
+            #         root.append(child)
+            #     xml_str = ET.tostring(root, encoding='utf-8', method='xml')
+            #     return xml_str.decode('utf-8')
+                pass
+            else:
+                return "<person></person>"
+
+        elif data.get('paramType') == 'html':
+            return response_data
+
+        else:
+            return json.dumps({})
 
     def headers(self, data: dict):
         """
         mock接口响应头处理
         """
-        pass
+        return data
 
     def config(self, data: dict):
         """
         mock接口设置
         """
-        pass
-
-    def main(self, method: str):
+        time.sleep(int(data.get('time', 0)))
+        return int(data.get('statusCode', 200))
+    def main(self):
         """
         mock接口执行层
         """
@@ -252,37 +278,26 @@ class MockEngine:
             source_ip = self.request.META.get('REMOTE_ADDR')+':' + self.request.META.get('SERVER_PORT')
             if source_ip in analytic_data.get('ipInput'):
                 # ip校验通过执行通过后的处理
-                self.response()
-                self.headers()
-                self.config()
-            elif analytic_data.get('ipInput','') is None:
+                response = self.response(analytic_data.get('response'))
+                headers = self.headers(analytic_data.get('headers'))
+                config = self.config(analytic_data.get('config'))
+                return Response(response, headers=headers, status=config)
+            elif analytic_data.get('ipInput', '') is None:
                 # ip校验开启了但是没有配置ip，继续获取期望的返回信息
-                self.response()
-                self.headers()
-                self.config()
+                response = self.response(analytic_data.get('response'))
+                headers = self.headers(analytic_data.get('headers'))
+                config = self.config(analytic_data.get('config'))
+                return Response(response, headers=headers, status=config)
 
 
             else:
                 return Response({"message": '访问主机ip校验不通过'}, status=status.HTTP_403_FORBIDDEN)
         else:
             # 未开启ip校验，继续获取期望的返回信息
-            self.response()
-            self.headers()
-            self.config()
-
-        if method == 'GET':
-            return self.get(mock_api_detail, mock_api)
-
-    def get(self, mock_api_detail:list, mock_api:Mock):
-        query_params = self.request.GET
-        params = {}
-        # 处理所有的查询参数
-        for key in query_params.keys():
-            value = query_params.get(key, '')
-            params[key] = value
-
-        return Response({"path": self.path, "mock_id": self.mock_id, **params}, status=status.HTTP_200_OK)
-
+            response = self.response(analytic_data.get('response'))
+            headers = self.headers(analytic_data.get('headers'))
+            config = self.config(analytic_data.get('config'))
+            return Response(response)
 
 
 
@@ -294,12 +309,12 @@ class MockAPIView(APIView):
     """
 
     def get(self, request: HttpRequest, path: str, mock_id: str) -> Response:
-        return MockEngine(request, path, mock_id).main(request.method)
+        return MockEngine(request, path, mock_id).main()
 
 
 
     def post(self, request: HttpRequest, path: str, mock_id: str) -> Response:
-        return Response({"message": '我是post'}, status=status.HTTP_200_OK)
+        return MockEngine(request, path, mock_id).main()
 
     def put(self, request: HttpRequest, path: str, mock_id: str) -> Response:
         return Response({"message": '我是put'}, status=status.HTTP_200_OK)

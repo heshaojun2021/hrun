@@ -200,7 +200,7 @@
                       <el-radio-group v-model="detailData.response.paramType" >
                         <el-radio label="json">application/json</el-radio>
                         <el-radio label="xml">application/xml</el-radio>
-                        <el-radio label="text">text/plain</el-radio>
+                        <el-radio label="html">html/plain</el-radio>
                       </el-radio-group>
                       <el-tooltip :content="sampleResponse" placement="top" effect="light">
                         <span class="el-icon-question" style="margin-left: 30px;color: #67c23a;">
