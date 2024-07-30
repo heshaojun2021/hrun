@@ -101,7 +101,7 @@ class MockEngine:
             if not mock_api.status:
                 return Response({"message": 'mock接口已禁用'}, status=status.HTTP_400_BAD_REQUEST)
 
-            return mock_api_detail, mock_api
+            return mock_api_detail, mock_api  # TODO: 需要校验请求类型方法
 
         except Mock.DoesNotExist:
             return Response({"message": 'mock接口不存在'}, status=status.HTTP_404_NOT_FOUND)
