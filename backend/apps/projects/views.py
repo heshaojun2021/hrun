@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 # @author: HRUN
-
+from django.http import HttpRequest
 from rest_framework import status
+from rest_framework.views import APIView
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+
+from common.mockengine import MockEngine
 from public.models import StatisticalRecord
 from users.models import User
 from .models import Project, TestEnv, TreeNode, newInterface, \
@@ -181,3 +184,26 @@ class mockLogViewSet(ModelViewSet):
     queryset = MockLog.objects.all()
     serializer_class = MockLogSerializer
     permission_classes = [IsAuthenticated]
+
+
+
+
+
+
+
+class MockAPIView(APIView):
+    """
+    MockAPIView
+    """
+
+    def get(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        return MockEngine(request, path, mock_id).main()
+
+    def post(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        return MockEngine(request, path, mock_id).main()
+
+    def put(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        return MockEngine(request, path, mock_id).main()
+
+    def delete(self, request: HttpRequest, path: str, mock_id: str) -> Response:
+        return MockEngine(request, path, mock_id).main()
