@@ -218,7 +218,7 @@
                             <div style="margin-left: 10px">
                             <div v-for="tag in mockTags" :key="tag" style="margin-bottom: 7px;">
                               <el-tooltip :content="`${tag.txt}`" placement="top" effect="light">
-                                <el-check-tag checked @click="copyText(tag.mockJS)" style="margin-right: 10px">
+                                <el-check-tag type="info"  @click="copyText(tag.mockJS)" style="margin-right: 10px">
                                   {{ tag.mockJS }}
                                 </el-check-tag>
                               </el-tooltip>
@@ -238,7 +238,7 @@
                     </el-tooltip>
                     <el-row>
                       <el-col :span="18">
-                        <Editor v-model="detailData.response.data"></Editor>
+                        <Editor v-model="detailData.headers"></Editor>
                       </el-col>
                       <el-col style="margin-top: -15px" :span="6">
                         <el-divider>脚本模板</el-divider>
@@ -448,7 +448,7 @@ export default {
       mockTags: [
           {mockJS: '@name()',txt:'随机生成名字'},
           {mockJS: '@integer(20, 40)',txt:'随机生成20到40之间的值'},
-          {mockJS: '@email',txt:'随机生成邮箱'},
+          {mockJS: '@email()',txt:'随机生成邮箱'},
           {mockJS: '@telephone()',txt:'返回一个随机的11位手机号码'},
           {mockJS: '@natural(1,100)',txt:'返回一个随机的1-100的自然数（大于等于 0 的整数）'},
           {mockJS: '@float( 1, 10, 2, 5 )',txt:'返回一个随机的浮点数，整数1-10，小数部分位数的最小值2，最大值5'},

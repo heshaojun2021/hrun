@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 # @author: HRUN
+
 import json
 import time
+import subprocess
+import xml.etree.ElementTree as ET
 
 from rest_framework import status
 from rest_framework.response import Response
 
 from projects.models import Mock
 
-import xml.etree.ElementTree as ET
 
 
 
@@ -121,7 +123,7 @@ class MockEngine:
             return self.request.headers
 
         else:
-            return dict
+            return {}
 
     def comparison(self, source_value, comparison_type: str, value):
         """
@@ -154,7 +156,8 @@ class MockEngine:
         """
         mock接口响应体处理
         """
-        response_data = data.get('data')
+        mock_js = data.get('data', '')
+        response_data = self.mock_js(mock_js)
         if data.get('paramType') == 'json':
             if response_data is not None:
                 return json.loads(response_data)
@@ -179,11 +182,12 @@ class MockEngine:
         else:
             return {}
 
-    def headers(self, data: dict) :
+    def headers(self, data):
         """
         mock接口响应头处理
         """
-        return json.loads(data)
+        headers_data = self.mock_js(data)
+        return json.loads(headers_data)
 
     def config(self, data: dict):
         """
@@ -191,6 +195,17 @@ class MockEngine:
         """
         time.sleep(int(data.get('time', 0)))
         return int(data.get('statusCode', 200))
+
+
+    def mock_js(self, data):
+        data_json = json.dumps(data)
+        # 构造Node.js命令
+        node_command = ['node', 'mock.js', data_json]
+        # 执行Node.js脚本并获取输出
+        result = subprocess.run(node_command, capture_output=True, text=True)
+
+        return json.loads(result.stdout)
+
     def main(self):
         """
         mock接口执行层
