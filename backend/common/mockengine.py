@@ -56,7 +56,7 @@ class MockEngine:
 
         if success_count > 1:
             # 匹配到多个期望
-            return Response({"message": 'mock接口数据集存在多个匹配结果'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": 'mock接口中匹配到多个结果,请确认接口配置是否正确!'}, status=status.HTTP_400_BAD_REQUEST)
 
         elif success_count == 1:
             return success_data[0]

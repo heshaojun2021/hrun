@@ -124,7 +124,7 @@
             <el-form-item label="期望名称" prop="name">
                 <el-input v-model="detailData.name"></el-input>
             </el-form-item>
-            <el-form-item label="参数条件" prop="conditionForm">
+            <el-form-item label="参数条件" prop="conditionForm" >
               <el-table :data="detailData.conditionForm"  stripe empty-text="暂无数据" border>
                 <el-table-column label="参数位置" width="180" prop="location"  align="center">
                   <template #default="scope">
@@ -207,7 +207,27 @@
                           支持Mock.js语法
                         </span>
                       </el-tooltip>
-                    <div ><Editor v-model="detailData.response.data"></Editor></div>
+                    <div>
+                    <el-row>
+                      <el-col :span="18">
+                        <Editor v-model="detailData.response.data"></Editor>
+                      </el-col>
+                      <el-col style="margin-top: -15px" :span="6">
+                        <el-divider>脚本模板</el-divider>
+                          <el-scrollbar height="380px">
+                            <div style="margin-left: 10px">
+                            <div v-for="tag in mockTags" :key="tag" style="margin-bottom: 7px;">
+                              <el-tooltip :content="`${tag.txt}`" placement="top" effect="light">
+                                <el-check-tag checked @click="copyText(tag.mockJS)" style="margin-right: 10px">
+                                  {{ tag.mockJS }}
+                                </el-check-tag>
+                              </el-tooltip>
+                            </div>
+                          </div>
+                          </el-scrollbar>
+                      </el-col>
+                    </el-row>
+                    </div>
                   </div>
 
                   <div v-if="activeIndex === '2'" class="munu">
@@ -216,7 +236,25 @@
                         示例
                       </span>
                     </el-tooltip>
-                    <div ><Editor v-model="detailData.headers"></Editor></div>
+                    <el-row>
+                      <el-col :span="18">
+                        <Editor v-model="detailData.response.data"></Editor>
+                      </el-col>
+                      <el-col style="margin-top: -15px" :span="6">
+                        <el-divider>脚本模板</el-divider>
+                          <el-scrollbar height="380px">
+                            <div style="margin-left: 10px">
+                            <div v-for="tag in mockTags" :key="tag" style="margin-bottom: 7px;">
+                              <el-tooltip :content="`${tag.txt}`" placement="top" effect="light">
+                                <el-check-tag checked @click="copyText(tag.mockJS)" style="margin-right: 10px">
+                                  {{ tag.mockJS }}
+                                </el-check-tag>
+                              </el-tooltip>
+                            </div>
+                          </div>
+                          </el-scrollbar>
+                      </el-col>
+                    </el-row>
                   </div>
 
                   <div v-if="activeIndex === '3'" class="munu">
@@ -238,7 +276,7 @@
                   </div>
             </el-form-item>
           </el-form>
-          <div slot="footer" class="dialog-footer" style="text-align: right;">
+          <div slot="footer" class="dialog-footer" style="text-align: center;">
               <el-button @click="closeDialog" >取 消</el-button>
               <el-button v-if="dialogTitle === '新建期望'" type="primary" @click="addMockDetail" >保 存</el-button>
               <el-button v-if="dialogTitle === '编辑期望'" type="primary" @click="editMockDetail" >保 存</el-button>
@@ -406,8 +444,35 @@ export default {
       sampleHeader: "{\n" +
           "        \"Content-Type\": \"application/json\",\n" +
           "        \"Authorization\": \"Bearer {{token}}\"\n" +
-          "      }"
+          "      }",
+      mockTags: [
+          {mockJS: '@name()',txt:'随机生成名字'},
+          {mockJS: '@integer(20, 40)',txt:'随机生成20到40之间的值'},
+          {mockJS: '@email',txt:'随机生成邮箱'},
+          {mockJS: '@telephone()',txt:'返回一个随机的11位手机号码'},
+          {mockJS: '@natural(1,100)',txt:'返回一个随机的1-100的自然数（大于等于 0 的整数）'},
+          {mockJS: '@float( 1, 10, 2, 5 )',txt:'返回一个随机的浮点数，整数1-10，小数部分位数的最小值2，最大值5'},
+          {mockJS: '@character(pool)',txt:'从字符串池返回随机的字符'},
+          {mockJS: '@string( pool, 1, 10 )',txt:'从字符串池返回一个随机字符串，字符数1-10'},
+          {mockJS: '@range( 1, 100, 1 )',txt:'返回一个整型数组，参数分别：start：起始值，stop：结束值，step：步长'},
+          {mockJS: '@now(\'yyyy-MM-dd HH:mm:ss\')',txt:'返回当前日期字符串。例：2014-04-29 20:08:38'},
+          {mockJS: '@date(\'yyyy-MM-dd\')',txt:'返回一个随机的日期字符串。例：1983-01-29'},
+          {mockJS: '@guid()',txt:'随机生成一个 GUID。例：eFD616Bd-e149-c98E-a041-5e12ED0C94Fd'},
+          {mockJS: '@increment(1)',txt:'随机生成主键，从1起，整数自增的步长'},
+          {mockJS: '@url(\'http\')',txt:'随机生成一个http URL'},
+          {mockJS: '@protocol()',txt:'随机生成一个 URL 协议。例：http ftp'},
+          {mockJS: '@domain()',txt:'随机生成一个域名'},
+          {mockJS: '@province()',txt:'随机生成一个（中国）省（或直辖市、自治区、特别行政区）'},
+          {mockJS: '@city()',txt:'随机生成一个（中国）市'},
+          {mockJS: '@county()',txt:'随机生成一个（中国）县'},
+          {mockJS: '@county(true)',txt:'随机生成一个（中国）县（带省市）。例：甘肃省 白银市 会宁县'},
+          {mockJS: '@zip()',txt:'随机生成一个邮政编码'},
+          {mockJS: '@color()',txt:'随机生成颜色，格式为 \'#RRGGBB\''},
+          {mockJS: '@paragraph()',txt:'随机生成一段文本'},
+          {mockJS: '@cparagraph()',txt:'随机生成一段中文文本'},
+          {mockJS: '@word()',txt:'随机生成一个单词'}
 
+          ]
     }
   },
   methods:{
@@ -631,6 +696,28 @@ export default {
           this.dialogTitle = '';
           break;
       }
+    },
+    copyText(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+            this.$message({
+              message: '已复制到剪贴板',
+              type: 'success'
+            });
+        }
+        else {
+            this.$message.error('复制失败，请手动复制');
+        }
+      } catch (error){
+            console.error('复制失败:', error);
+            this.$message.error('复制失败，请手动复制');
+          }
+      document.body.removeChild(textarea);
     },
 
 
