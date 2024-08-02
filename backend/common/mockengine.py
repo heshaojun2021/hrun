@@ -93,6 +93,8 @@ class MockEngine:
 
         elif len(expect_form) > 1:
             for params in expect_form:
+                if all(value == '' or value is None for value in params.values()):
+                    return True
                 source = self.data_source(params.get('location'))
                 paramName = params.get('paramName')
                 # 处理值类型转换
