@@ -66,18 +66,24 @@ class MockEngine:
         else:
             # 没有设置期望表单或未匹配上
             return Response({"message": '成功'}, status=status.HTTP_200_OK)
+
     def judge_diff(self, expect_form: list):
         """
         mock接口数据判断比对
         """
         if len(expect_form) == 1:
             params = expect_form[0]
+            if all(value == '' or value is None for value in params.values()):
+                return True
             source = self.data_source(params.get('location'))
             paramName = params.get('paramName')
+
+            # 处理值类型转换
+            value = self.value_type(params.get('value', ''), params.get('valueType','String'))
             if paramName in source:
                 for key in source:
                     source_value = source[key]
-                    comparison = self.comparison(source_value,params.get('comparison'),params.get('value',''))
+                    comparison = self.comparison(source_value,params.get('comparison'),value)
                     if comparison:
                         return True
                     else:
@@ -89,10 +95,12 @@ class MockEngine:
             for params in expect_form:
                 source = self.data_source(params.get('location'))
                 paramName = params.get('paramName')
+                # 处理值类型转换
+                value = self.value_type(params.get('value', ''), params.get('valueType', 'String'))
                 if paramName in source:
                     for key in source:
                         source_value = source[key]
-                        comparison = self.comparison(source_value, params.get('comparison'), params.get('value', ''))
+                        comparison = self.comparison(source_value, params.get('comparison'), value)
                         if comparison:
                             return True
                         else:
@@ -150,7 +158,25 @@ class MockEngine:
 
         return comparison_mapping[comparison_type](source_value, value)
 
-
+    def value_type(self, value, value_type: str):
+        """
+        mock传参值类型转换
+        """
+        try:
+            if value_type == 'String':
+                return str(value)
+            elif value_type == 'Integer':
+                return int(value)
+            elif value_type == 'Float':
+                return float(value)
+            elif value_type == 'Boolean':
+                return bool(value)
+            elif value_type == 'Array':
+                return list(value)
+            else:
+                return value
+        except (TypeError, ValueError):
+            return value
 
     def response(self, data: dict):
         """
@@ -195,7 +221,6 @@ class MockEngine:
         """
         time.sleep(int(data.get('time', 0)))
         return int(data.get('statusCode', 200))
-
 
     def mock_js(self, data):
         data_json = json.dumps(data)

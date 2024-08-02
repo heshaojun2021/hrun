@@ -97,16 +97,16 @@
                                 placement="top"
                                 color="#0bbd87">
               <span>
-                <el-tag v-if="activity.method==='GET'" type="success">{{activity.method}}</el-tag>
-                <el-tag v-else >{{activity.method}}</el-tag>
-                <span class="grey-text">{{activity.url}}</span>
+                <el-tag style="margin-right: 10px" v-if="activity.method==='GET'" type="success">{{activity.method}}</el-tag>
+                <el-tag style="margin-right: 10px" v-else >{{activity.method}}</el-tag>
+                <span class="grey-text" style="margin-right: 10px">{{activity.url}}</span>
                 <span style="font-weight: bold;">调用IP：</span>
-                <span class="grey-text1">{{activity.ip}}</span>
+                <span class="grey-text1" style="margin-right: 10px">{{activity.ip}}</span>
                 <span style="font-weight: bold">HTTP状态码：</span>
                 <span v-if="activity.status_code==='200'" class="grey-text1" style="color:#67c23a;">{{activity.status_code}}</span>
                 <span v-if="activity.status_code==='400'" class="grey-text1" style="color:#e6a23c;">{{activity.status_code}}</span>
                 <span v-if="activity.status_code==='500'" class="grey-text1" style="color:#f56c6c">{{activity.status_code}}</span>
-                <span class="grey-text">{{activity.time_consuming}}</span>
+                <span style="margin-left: 10px" class="grey-text">{{activity.time_consuming}}</span>
               </span>
 
               </el-timeline-item>
@@ -128,7 +128,7 @@
               <el-table :data="detailData.conditionForm"  stripe empty-text="暂无数据" border>
                 <el-table-column label="参数位置" width="180" prop="location"  align="center">
                   <template #default="scope">
-                    <el-select v-model="scope.row.location" placeholder="请选择参数位置" style="width: 155px;color: black;padding: 0px">
+                    <el-select clearable v-model="scope.row.location" placeholder="请选择参数位置" style="width: 155px;color: black;padding: 0px">
                       <el-option label="query" value="query"/>
                       <el-option label="path" value="path"/>
                       <el-option label="header" value="header"/>
@@ -143,7 +143,7 @@
                 </el-table-column>
                 <el-table-column label="比较" width="180" prop="comparison" align="center" >
                   <template #default="scope">
-                    <el-select v-model="scope.row.comparison" placeholder="请选择"  style="width: 155px;color: black;padding: 0px">
+                    <el-select clearable v-model="scope.row.comparison" placeholder="请选择"  style="width: 155px;color: black;padding: 0px">
                             <el-option
                               v-for="item in options"
                               :key="item.value"
@@ -155,7 +155,15 @@
                 </el-table-column>
                 <el-table-column label="参数值" prop="value" align="center">
                   <template #default="scope">
-                    <el-input v-model="scope.row.value"></el-input>
+                    <el-input style="width: 245px" v-model="scope.row.value" ></el-input>
+                    <el-select v-model="scope.row.valueType" placeholder="String"  style="width: 90px;padding: 0px">
+                            <el-option
+                              v-for="item in typeOptions"
+                              :key="item.value"
+                              :label="item.label"
+                              :value="item.value"
+                            />
+                    </el-select>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" width="100" align="center">
@@ -175,7 +183,7 @@
               </el-button>
             </el-form-item>
             <div style="margin-bottom: 30px; font-size: 16px">IP 条件
-              <el-tooltip content="开启后该期望仅对 指定IP 的地址生效; 填写示例：http://127.0.0.1:8080" :enterable="false" placement="top" effect="light">
+              <el-tooltip content="开启后该期望仅对 指定IP 的地址生效; 填写示例：127.0.0.1:8080" :enterable="false" placement="top" effect="light">
                 <i class="el-icon-question" style="color: #53a8ff; font-size: 16px;"></i>
               </el-tooltip>
               <el-switch
@@ -328,7 +336,8 @@ export default {
               location:'',
               paramName:'',
               comparison:'',
-              value:''
+              value:'',
+              valueType:'String',
             },
 
         ],
@@ -434,6 +443,13 @@ export default {
           { value: 'empty', label: '空' },
           { value: 'notEmpty', label: '非空' }
         ],
+      typeOptions: [
+          { value: 'String', label: 'String' },
+          { value: 'Integer', label: 'Integer' },
+          { value: 'Array', label: 'Array' },
+          { value: 'Boolean', label: 'Boolean' },
+          { value: 'Float', label: 'Float' },
+       ],
       sampleResponse:"示例\n" +
           "    {\n" +
           "        \"name\": \"@name\",\n" +
@@ -500,13 +516,14 @@ export default {
                                 location:'',
                                 paramName:'',
                                 comparison:'',
-                                value:''
+                                value:'',
+                                valueType:'String',
                               },
                           ],
                           ipCode:false,
                           ipInput:'',
-                          response:{paramType: 'json',data:''},
-                          headers:'',
+                          response:{paramType: 'json',data:'{}'},
+                          headers:'{}',
                           config:{statusCode:'200', time:'0'}
       };
     },
@@ -517,7 +534,8 @@ export default {
         location: '',
         paramName: '',
         comparison: '',
-        value: ''
+        value: '',
+        valueType:'String',
       };
       this.detailData.conditionForm.push(newItem);
     },
